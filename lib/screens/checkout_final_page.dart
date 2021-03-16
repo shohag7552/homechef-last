@@ -1,17 +1,89 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:home_chef/bottom_navigation/home_page.dart';
 import 'package:home_chef/constant.dart';
+import 'package:home_chef/model/All_items_model.dart';
+import 'package:home_chef/model/Sumarry_model.dart';
+import 'package:home_chef/model/profile_model.dart';
+import 'package:home_chef/server/http_request.dart';
 
 class FinalCheckoutPage extends StatefulWidget {
+   final int order_id;
+  FinalCheckoutPage({this.order_id});
   @override
   _FinalCheckoutPageState createState() => _FinalCheckoutPageState();
 }
 
 class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
+
+  List<Sumary> item = [];
+
+  Sumary allItems;
+
+  Future<dynamic> fetchSubCategories(int id) async {
+    final data = await CustomHttpRequest.getSummaryItems(id);
+
+    //items = cast<Items>(data);
+    print(id);
+    print("User data are $data");
+    allItems = Sumary.fromJson(data);
+    print(
+        '....#####################..................................................................');
+    print(allItems);
+    print(
+        '.......#############################..........................................................');
+
+    try {
+      item.firstWhere((element) => element.id == allItems.id);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          item.add(allItems);
+        });
+      }
+    }
+  }
+
+  List<Profile> profileData=[];
+  Profile profile;
+
+  Future<dynamic> fetchProfile() async {
+    final data = await CustomHttpRequest.getProfile();
+
+    print("User data are $data");
+    profile = Profile.fromJson(data);
+    print(
+        '....#####################..................................................................');
+    print(profile);
+    print(
+        '.......#############################..........................................................');
+/*
+    try {
+      profileData.firstWhere((element) => element.name == profile.name);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          item.add(allItems);
+        });
+      }
+    }*/
+  }
+
+
+
+
+  @override
+  void initState() {
+    fetchSubCategories(widget.order_id);
+    fetchProfile();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        body: Center(
+      child:  Scaffold(
+        body: widget.order_id == null ? Container(child: Center(child: CircularProgressIndicator(),),) :Center(
           child: Stack(
             children: [
               Column(
@@ -73,9 +145,14 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                               borderRadius:
                               BorderRadius.all(Radius.circular(10)),
                             ),
-                            child: ListView.builder(
-                              itemCount: 5,
+                            child:allItems.orderFoodItems.length == null? CircularProgressIndicator() :ListView.builder(
+                              itemCount: allItems.orderFoodItems.length,
                               itemBuilder: (context, index) {
+                                int quantity = int.parse(allItems.orderFoodItems[index].pivot.quantity);
+                                print(quantity.toString());
+                                double price = double.parse(allItems.orderFoodItems[index].price[0].originalPrice);
+
+
                                 return Padding(
                                   padding:
                                   const EdgeInsets.symmetric(vertical: 10),
@@ -83,18 +160,18 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                     leading: CircleAvatar(
                                       //child: Image.asset('assets/pizza.jpg'),
                                       backgroundImage:
-                                      AssetImage('assets/pizza.jpg'),
+                                      NetworkImage("https://homechef.masudlearn.com/images/${allItems.orderFoodItems[index].image}"),
                                       radius: 30,
                                     ),
                                     title: Text(
-                                      'Beep Burger',
+                                      allItems.orderFoodItems[index].name,
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500),
                                     ),
-                                    subtitle: Text('x2'),
+                                    subtitle: Text('x ${allItems.orderFoodItems[index].pivot.quantity}'),
                                     trailing: Text(
-                                      '150.00',
+                                      '${price * quantity}',
                                       style: TextStyle(
                                           color: cTextColor,
                                           fontSize: 16,
@@ -103,7 +180,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                   ),
                                 );
                               },
-                            ),
+                            ) ,
                           ),
                           SizedBox(
                             height: 30,
@@ -129,7 +206,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                           fontSize: 12, color: Colors.black38),
                                     ),
                                     Text(
-                                      ' Nahid Hasan Limon',
+                                      profile.name,
                                       style: TextStyle(fontSize: 12),
                                     ),
                                   ],
@@ -145,7 +222,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                           fontSize: 12, color: Colors.black38),
                                     ),
                                     Text(
-                                      ' 01648486521',
+                                      profile.contact,
                                       style: TextStyle(fontSize: 12),
                                     ),
                                   ],
@@ -191,7 +268,11 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                     ),
                   ),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    },
                     child: Center(
                       child: Text(
                         'Finish',

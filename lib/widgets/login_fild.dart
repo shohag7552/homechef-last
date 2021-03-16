@@ -3,10 +3,11 @@ import 'package:home_chef/constant.dart';
 
 class LoginTextField extends StatelessWidget {
   final String name, hint;
+  final dynamic controller;
   final dynamic suffixIcon;
   final Function validator;
   final Function onSave;
-  LoginTextField({this.name, this.hint, this.suffixIcon,this.validator,this.onSave});
+  LoginTextField({this.name,this.controller, this.hint, this.suffixIcon,this.validator,this.onSave});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -27,7 +28,7 @@ class LoginTextField extends StatelessWidget {
           child: Container(
             //height: 50,
             child: TextFormField(
-
+              controller: controller,
               validator: validator,
               onSaved: onSave,
               decoration: InputDecoration(

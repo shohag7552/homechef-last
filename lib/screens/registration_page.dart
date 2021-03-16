@@ -1,6 +1,18 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:home_chef/constant.dart';
+import 'package:home_chef/screens/login_page.dart';
+import 'package:home_chef/server/http_request.dart';
+import 'package:home_chef/widgets/mainPage.dart';
 import 'package:home_chef/widgets/registerTextField.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -9,18 +21,203 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController name = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPassController = TextEditingController();
+  TextEditingController contactController = TextEditingController();
 
-  String username, useremail, userpassword, userconfirmpass;
+  String username, useremail, userpassword, userconfirmpass,usercontact;
+  final picker = ImagePicker();
+  File image = null;
+  bool _obscureText = true;
+  bool _conobscureText = true;
+  bool onProgress = false;
+
+  // _cropImage(pickedImage) async {
+  //   final cropped = await ImageCropper.cropImage(
+  //     androidUiSettings: AndroidUiSettings(
+  //         lockAspectRatio: false,
+  //         statusBarColor: hHighlightTextColor,
+  //         toolbarColor: hHighlightTextColor,
+  //         toolbarWidgetColor: kwhiteColor,
+  //         toolbarTitle: 'Crop Image'),
+  //     sourcePath: pickedImage.path,
+  //       aspectRatioPresets: [
+  //         CropAspectRatioPreset.original,
+  //         CropAspectRatioPreset.ratio16x9,
+  //         CropAspectRatioPreset.ratio4x3,
+  //       ]
+  //   );
+  //   if(cropped != null){
+  //     setState(() {
+  //       _image = cropped;
+  //     });
+  //   }
+  // }
+  //
+  // Future chooseGallery() async {
+  //   // ignore: deprecated_member_use
+  //   File pickedImage = await ImagePicker.pickImage(source: ImageSource.gallery);
+  //   if (pickedImage != null) {
+  //     _cropImage(pickedImage);
+  //   }
+  //   Navigator.pop(context);
+  // }
+  //
+  // Future chooseCamera() async {
+  //   // ignore: deprecated_member_use
+  //   File pickedImage = await ImagePicker.pickImage(source: ImageSource.camera);
+  //   if (pickedImage != null) {
+  //     _cropImage(pickedImage);
+  //   }
+  //   Navigator.pop(context);
+  // }
+  // Future getImage(BuildContext context) async{
+  //   final image = await ImagePicker.pickImage(source: ImageSource.camera);
+  //   setState(() {
+  //     _image = image;
+  //   });
+  // }
+
+  // picImage() async{
+  //   final picImage = await picker.getImage(source: ImageSource.gallery);
+  //   _image = File(picImage.path);
+  //
+  //   print('image get');
+  // }
+
+  //  selectImage(parentContext) {
+  //   return showDialog(
+  //       context: parentContext,
+  //       builder: (context) {
+  //         return SimpleDialog(
+  //           title: Text(
+  //             "Upload Image",
+  //             style: TextStyle(),
+  //           ),
+  //           children: [
+  //             SimpleDialogOption(
+  //               child: Text("Image from Gallery"),
+  //               onPressed: () {
+  //                 print("Gallery");
+  //                 chooseGallery();
+  //                 // picImage();
+  //               },
+  //             ),
+  //             SimpleDialogOption(
+  //               child: Text("Image from Camera"),
+  //               onPressed: () {
+  //                 print("open camera");
+  //                chooseCamera();
+  //                //  getImage(parentContext);
+  //               },
+  //             ),
+  //             SimpleDialogOption(
+  //               child: Text("cancel"),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //             )
+  //           ],
+  //         );
+  //       });
+  // }
+  Future getImageformGallery() async {
+    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedImage != null) {
+        image = File(pickedImage.path);
+      } else {
+        print('no image found');
+      }
+    });
+  }
+  SharedPreferences sharedPreferences;
+  String token;
+
+  Future<bool> check() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      return true;
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      return true;
+    }
+    return false;
+  }
+
+  Future getRegister(BuildContext context) async{
+    sharedPreferences = await SharedPreferences.getInstance();
+    try{
+      check().then((internet) async{
+        if(internet != null && internet){
+          if(mounted){
+            setState(() {
+              onProgress = true;
+            });
+
+            final uri = Uri.parse("https://apihomechef.masudlearn.com/api/register");
+            var request = http.MultipartRequest("POST",uri);
+            request.headers.addAll(await CustomHttpRequest.defaultHeader);
+            request.fields['name'] = nameController.text.toString();
+            request.fields['email'] = emailController.text.toString();
+            request.fields['password'] = passwordController.text.toString();
+            request.fields['password_confirmation'] = confirmPassController.text.toString();
+            request.fields['contact'] = contactController.text.toString();
+            var photo = await http.MultipartFile.fromPath('image', image.path);
+            print('processing');
+            request.files.add(photo);
+            var response = await request.send();
+            var responseData = await response.stream.toBytes();
+            var responseString = String.fromCharCodes(responseData);
+            print("responseBody " + responseString);
+            if (response.statusCode == 201) {
+              print("responseBody1 " + responseString);
+              //var data = jsonDecode(responseString);
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+            }
+            else{
+              setState(() {
+                onProgress = false;
+              });
+              var errorr = jsonDecode(responseString.trim().toString());
+              showInSnackBar("Registered Failed, ${errorr}");
+              print("Registered failed " + responseString);
+
+            }
+          }
+        }else
+          showInSnackBar("No Internet Connection");
+      });
+    }catch(e){
+      print("something went wrong $e");
+    }
+  }
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void showInSnackBar(String value) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: Text(
+        value,
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      backgroundColor: Colors.red,
+    ));
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+
         body: Form(
           key: _formKey,
-          child: Container(
+          child: onProgress == false ? Container(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
               child: ListView(
                 // mainAxisAlignment: MainAxisAlignment.start,
                 // crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,31 +238,65 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   Center(
                     child: Column(
                       children: [
-                        Container(
-                          height: 80,
-                          width: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(50)),
-                            border: Border.all(
-                                color: hHighlightTextColor, width: 2.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: hBlackColor,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(50),
-                                ),
-                              ),
-                              child: Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
-                                size: 30,
-                              ),
+                        Stack(children: [
+                          Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(50)),
+                              border: Border.all(
+                                  color: hHighlightTextColor, width: 2.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                    color: hBlackColor,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(50),
+                                    ),
+                                  ),
+                                  child: image == null
+                                      ? IconButton(
+                                          onPressed: () {
+                                            // selectImage(context);
+                                            getImageformGallery();
+                                          },
+                                          icon: Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.white,
+                                            size: 30,
+                                          ),
+                                        )
+                                      : CircleAvatar(
+                                          backgroundImage: FileImage(image),
+                                        )
+                                  // : Image.file(
+                                  //     image,
+                                  //     fit: BoxFit.cover,
+                                  //   ),
+                                  ),
                             ),
                           ),
-                        ),
+                          Positioned(
+                            right: -15,
+                            top: -15,
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  image = null;
+                                });
+                              },
+                              icon: image != null
+                                  ? Icon(Icons.clear)
+                                  : Icon(
+                                      Icons.clear,
+                                      color: Colors.transparent,
+                                    ),
+                            ),
+                          ),
+                        ]),
                         SizedBox(
                           height: 10,
                         ),
@@ -111,18 +342,40 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   RegiTextField(
                     name: 'Your name',
                     hint: 'Enter your name',
-                    validator: (value) {
+                    controller: nameController,
+                    validator: ( value) {
                       if (value.isEmpty) {
-                        return "*username already taken";
+                        return "*username required";
                       }
-                      if (value<3) {
-                        return "*username already taken";
-                      } else if (value>10) {
-                        return "*username already taken";
+                      if (value.length < 3) {
+                        return "*username is too short";
+                      } else if (value.length > 10) {
+                        return "*user name is long";
                       }
                     },
-                    onSave: (name) {
+                    onSave: (String name) {
                       username = name;
+                    },
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  RegiTextField(
+                    name: 'Your Contact Number',
+                    hint: 'Enter your contact number',
+                    controller: contactController,
+                    validator: ( value) {
+                      if (value.isEmpty) {
+                        return "*user contact required";
+                      }
+                      if (value.length < 3) {
+                        return "*please write more then 3 word";
+                      } else if (value.length > 11) {
+                        return "*please write valid contact";
+                      }
+                    },
+                    onSave: (String contact) {
+                      usercontact = contact;
                     },
                   ),
                   SizedBox(
@@ -131,9 +384,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   RegiTextField(
                     name: 'Your email',
                     hint: 'Enter your email address',
+                    controller: emailController,
                     validator: (value) {
                       if (value.isEmpty) {
-                        return "*wrong email address";
+                        return "*Email is empty";
                       }
                       if (!value.contains('@')) {
                         return "*wrong email address";
@@ -141,58 +395,162 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         return "*wrong email address";
                       }
                     },
-                    onSave: (email) {
+                    onSave: (String email) {
                       useremail = email;
                     },
                   ),
                   SizedBox(
                     height: 10,
                   ),
-                  RegiTextField(
-                    name: 'Your password',
-                    hint: 'Enter your password',
-                    suffixIcon: Icon(
-                      Icons.visibility,
-                      size: 18,
+
+                  Text(
+                    'Your password',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                     ),
+                  ),
+                  SizedBox(height: 10,),
+                  TextFormField(
+                    controller: passwordController,
                     validator: (value) {
                       if (value.isEmpty) {
-                        return "*wrong password";
+                        return "*Password is empty";
                       }
-                      if (value<3) {
-                        return "*wrong password";
-                      } else if (value>10) {
-                        return "*wrong password";
+                      if (value.length < 3) {
+                        return "*Password is too short";
+                      }
+                      if (value.length > 10) {
+                        return "*Password not contains more then 10 carecters";
                       }
                     },
-                    onSave: (pass) {
-                      userpassword = pass;
-                    },
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gapPadding: 5.0,
+                        borderSide:
+                            BorderSide(color: hHighlightTextColor, width: 2.5),
+                      ),
+                      hintText: 'Enter your Password',
+                      hintStyle: TextStyle(fontSize: 14),
+                      suffixIcon: GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                        child: Icon(
+                          _obscureText?
+                            Icons.visibility: Icons.visibility_off),
+                      ),
+                    ),
+                    obscureText: _obscureText,
                   ),
+
+                  // RegiTextField(
+                  //   name: 'Your password',
+                  //   hint: 'Enter your password',
+                  //   suffixIcon: GestureDetector(
+                  //     onTap: (){
+                  //       setState(() {
+                  //         _obscureText = !_obscureText;
+                  //       });
+                  //     },
+                  //     child: Icon(
+                  //       _obscureText?
+                  //       Icons.visibility:Icons.visibility_off,
+                  //       size: 18,
+                  //     ),
+                  //   ),
+                  //   controller: passwordController,
+                  //   obscureText: _obscureText,
+                  //   validator: (value) {
+                  //     if (value.isEmpty) {
+                  //       return "*wrong password";
+                  //     }
+                  //     if (value < 3) {
+                  //       return "*wrong password";
+                  //     } else if (value > 10) {
+                  //       return "*wrong password";
+                  //     }
+                  //   },
+                  //   onSave: (pass) {
+                  //     userpassword = pass;
+                  //   },
+                  // ),
                   SizedBox(
-                    height: 10,
+                    height: 20,
                   ),
-                  RegiTextField(
-                    name: 'Confirm your password',
-                    hint: 'Enter your password',
-                    suffixIcon: Icon(
-                      Icons.visibility,
-                      size: 18,
+                  Text(
+                    'Your Confirm password',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                     ),
+                  ),
+                  SizedBox(height: 10,),
+                  TextFormField(
+                    controller: confirmPassController,
                     validator: (value) {
                       if (value.isEmpty) {
-                        return "*password doesn't match";
+                        return "Confirm Password required ";
                       }
-                      if (value<3) {
-                        return "*password doesn't match";
-                      } else if (value>10) {
-                        return "*password doesn't match";
+                      if (value.length < 6) {
+                        return "Password Too Short";
+                      }
+                      if (value.length > 15) {
+                        return "Password Too long ( 6 - 15 character )";
+                      }
+                      if (passwordController.text !=
+                          confirmPassController.text) {
+                        return "Password do not match";
                       }
                     },
-                    onSave: (pass) {
-                      userconfirmpass = pass;
-                    },
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gapPadding: 5.0,
+                        borderSide:
+                        BorderSide(color: hHighlightTextColor, width: 2.5),
+                      ),
+                      hintText: 'Enter your Password',
+                      hintStyle: TextStyle(fontSize: 14),
+                      suffixIcon: GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            _conobscureText = !_conobscureText;
+                          });
+                        },
+                        child: Icon(
+                            _conobscureText?
+                            Icons.visibility: Icons.visibility_off),
+                      ),
+                    ),
+                    obscureText: _conobscureText,
                   ),
+                  // RegiTextField(
+                  //   name: 'Confirm your password',
+                  //   hint: 'Enter your password',
+                  //   suffixIcon: Icon(
+                  //     Icons.visibility,
+                  //     size: 18,
+                  //   ),
+                  //   validator: (value) {
+                  //     if (value.isEmpty) {
+                  //       return "*password doesn't match";
+                  //     }
+                  //     if (value < 3) {
+                  //       return "*password doesn't match";
+                  //     } else if (value > 10) {
+                  //       return "*password doesn't match";
+                  //     }
+                  //   },
+                  //   onSave: (pass) {
+                  //     userconfirmpass = pass;
+                  //   },
+                  // ),
                   SizedBox(
                     height: 20,
                   ),
@@ -208,7 +566,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
                           _formKey.currentState.save();
+                          getRegister(context);
                         }
+
+                        print('clicked');
                       },
                       child: Center(
                         child: Text(
@@ -238,15 +599,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         ),
                         child: TextButton(
                           onPressed: () {
-
+                            Navigator.pop(context);
                           },
-                          child: Center(child: Text('Log In',style: TextStyle(color: hBlackColor),)),
+                          child: Center(
+                              child: Text(
+                            'Log In',
+                            style: TextStyle(color: hBlackColor),
+                          )),
                         ),
                       )
                     ],
                   )
                 ],
               ),
+            ),
+          ): Container(
+            child: Center(
+              child: Text('Loading'),
             ),
           ),
         ),

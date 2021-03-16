@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:home_chef/model/All_items_model.dart';
 
 class ProductCard extends StatefulWidget {
-  final String price,image,name;
+  final String price, image, name;
   final String disprice;
 
-  ProductCard({this.price,this.disprice,this.image,this.name});
+  ProductCard({this.price, this.disprice, this.image, this.name});
+
   // final List<Products> products;
   // ProductCard({this.products});
   @override
@@ -52,7 +53,7 @@ class _ProductCardState extends State<ProductCard> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    this.widget.name ??"",
+                    this.widget.name ?? "",
                     style: TextStyle(color: Colors.grey, fontSize: 16),
                   ),
                 ),

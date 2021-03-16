@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:home_chef/bottom_navigation/home_page.dart';
 import 'package:home_chef/provider/Burger_category_provider.dart';
 import 'package:home_chef/provider/homepage_provider.dart';
+import 'package:home_chef/screens/cart_page.dart';
 import 'package:home_chef/screens/login_page.dart';
 import 'package:home_chef/screens/registration_page.dart';
 import 'package:home_chef/widgets/mainPage.dart';
@@ -28,7 +30,12 @@ class MyApp extends StatelessWidget {
           primaryColor: hHighlightTextColor,
           canvasColor: Colors.white,
         ),
-        home: MainPage(),
+        home:
+        MainPage(),
+        routes: {
+          HomePage.id:(context)=>HomePage(),
+
+        },
       ),
     );
   }

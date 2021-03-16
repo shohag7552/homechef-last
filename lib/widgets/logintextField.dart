@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:home_chef/constant.dart';
 
 
-class SenderTextEdit extends StatelessWidget {
-  SenderTextEdit(
+class LoginTextEdit extends StatelessWidget {
+  LoginTextEdit(
       {this.icon,
         this.keytype,
         this.lebelText,
@@ -16,7 +16,7 @@ class SenderTextEdit extends StatelessWidget {
         this.initialText,
         this.suffixIcon,
         this.formatter,
-
+        //this.obscuretext,
       });
 
   final TextEditingController controller;
@@ -30,7 +30,7 @@ class SenderTextEdit extends StatelessWidget {
   final String lebelText;
   final dynamic formatter;
   final dynamic keytype;
-
+  //final bool obscuretext;
   final String keyy;
 
   @override
@@ -47,8 +47,9 @@ class SenderTextEdit extends StatelessWidget {
         keyboardType: keytype,
         controller: controller,
         inputFormatters: formatter,
+        //obscureText: obscuretext,
         validator: function,
-        onSaved: (String value) => data[keyy] = value,
+        //onSaved: (String value) => data[keyy] = value,
         onChanged: (initialText)=>{
 
         },
@@ -61,6 +62,7 @@ class SenderTextEdit extends StatelessWidget {
               borderSide:  BorderSide(color: hHighlightTextColor,width: 2.5)),
           labelText: lebelText,
           suffixIcon: suffixIcon,
+
           prefixIcon: Icon(
             icon,
             color: Colors.black54,

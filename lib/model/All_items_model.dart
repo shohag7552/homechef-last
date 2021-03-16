@@ -46,6 +46,9 @@ class Food {
   Pivot pivot;
   List<Price> price;
 
+  // factory Food.fromJson(dynamic json) {
+  //   return Food(json['id'] as int, json['name'] as String, json['image'] as String, json['pivot'] as Pivot, json['price'] as List<Price>);
+  // }
   factory Food.fromJson(Map<String, dynamic> json) => Food(
     id: json["id"],
     name: json["name"],

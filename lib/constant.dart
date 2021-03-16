@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 const Color hBlackColor = Color(0xFF1A1A1A);
 const Color hHighlightTextColor = Color(0xFFFEC61C);
+const Color hHighlightTextColor2 = Color(0xFFFEC64c);
 const Color hTextColor = Color(0xFF222B45);
 const Color hBackgroundColor = Color(0xFFeeeeee);
 const Color kBackgroundColor = Color(0xFFe0e0e0);

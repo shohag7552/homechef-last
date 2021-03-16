@@ -9,7 +9,7 @@ class MyitemsProvider with ChangeNotifier {
     return _category;
   }
 
-  Future<dynamic> fetchCategoryData() async {
+  /*Future<dynamic> fetchCategoryData() async {
 
     final data = await CustomHttpRequest.getItems();
     print("value are $data");
@@ -20,12 +20,12 @@ class MyitemsProvider with ChangeNotifier {
         image: entries['image'],
       );
       try {
-        print(" view my entries are  ${entries['position']}");
+        print(" view my entries are  ${entries['name']}");
         _category.firstWhere((element) => element.id == entries['id']);
       } catch (e) {
         _category.add(model);
       }
     }
     notifyListeners();
-  }
+  }*/
 }

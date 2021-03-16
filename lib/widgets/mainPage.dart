@@ -7,6 +7,8 @@ import 'package:home_chef/bottom_navigation/search_page.dart';
 import 'package:home_chef/bottom_navigation/setting_page.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_chef/screens/login_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class MainPage extends StatefulWidget {
   @override
   _MainPageState createState() => _MainPageState();
@@ -23,6 +25,24 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       return _selectedItem = index;
     });
+  }
+  SharedPreferences sharedPreferences;
+  void isLogin()async{
+    sharedPreferences = await SharedPreferences.getInstance();
+    token = sharedPreferences.getString("token");
+    print(token);
+    if(token==null){
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
+        return LoginPage();
+      }));
+    }
+  }
+String token;
+
+  @override
+  void initState() {
+    isLogin();
+    super.initState();
   }
 
   @override
