@@ -41,7 +41,7 @@ String token;
 
   @override
   void initState() {
-    isLogin();
+    //isLogin();
     super.initState();
   }
 

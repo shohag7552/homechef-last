@@ -128,6 +128,7 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
                           "https://homechef.masudlearn.com/images/${allItems.foods[index].image}",
                       name: allItems.foods[index].name ?? "",
                       price: allItems.foods[index].price[0].originalPrice,
+                      disprice: allItems.foods[index].price[0].discountedPrice,
                     ),
                   );
                 },

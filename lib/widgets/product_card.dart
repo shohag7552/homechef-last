@@ -23,23 +23,25 @@ class _ProductCardState extends State<ProductCard> {
       child: Card(
         child: Stack(
           children: [
-            Positioned(
+            /*Positioned(
               bottom: 10,
               right: 10,
               child: Container(
                 height: 20,
                 width: 20,
                 decoration: BoxDecoration(
+                  color: Colors.black26,
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-            ),
+            ),*/
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(5.0),topRight: Radius.circular(5.0)),
                       image: DecorationImage(
                         fit: BoxFit.cover,
                         image: NetworkImage(this.widget.image ?? ""),
@@ -61,15 +63,26 @@ class _ProductCardState extends State<ProductCard> {
                   height: 5,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(
-                    '\$ ${this.widget.price ?? ""}',
-                    style: TextStyle(color: Colors.black, fontSize: 16),
+                  padding: const EdgeInsets.only(left: 8.0,right: 8.0),
+                  child: Row(
+                    children: [
+                      Spacer(),
+                      Text(
+                        '\৳ ${this.widget.price ?? ""}',
+                        style: TextStyle(color: Colors.black26, fontSize: 10,
+                        decoration: TextDecoration.lineThrough),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        '\৳${this.widget.disprice ?? ""}',
+                        style: TextStyle(color: Colors.black, fontSize: 16,fontWeight: FontWeight.w500),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(
-                  height: 5,
-                ),
+                SizedBox(height: 10,)
               ],
             ),
           ],

@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_chef/bottom_navigation/search_page.dart';
 import 'package:home_chef/categories_pages/show_items_by_category.dart';
 import 'package:home_chef/constant.dart';
 import 'package:home_chef/model/cartItems.dart';
 import 'package:home_chef/model/category_model.dart';
 import 'package:home_chef/model/profile_model.dart';
+import 'package:home_chef/provider/CartLength_provider.dart';
 import 'package:home_chef/provider/homepage_provider.dart';
 import 'package:home_chef/screens/cart_page.dart';
 import 'package:home_chef/screens/edit_profile.dart';
@@ -29,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   //   "Chicken fry"
   // ];
   List<CategoryModel> categories = [];
+  String token;
 
   int selectIndex = 0;
   int itemSelect = 0;
@@ -64,33 +69,56 @@ class _HomePageState extends State<HomePage> {
   }
 
   //cart page length
-  List<CartItem> items = [];
+  List<CartItem> cartLength = [];
   int length;
 
+  /*getCartLength() async {
+    print("expenditure entries are");
+    final data = await Provider.of<CartLengthProvider>(context, listen: false)
+        .fetchLength();
+    print("aaaaaaaaaaaaaaaa${data}");
+  }*/
   Future<dynamic> getCartLength() async {
-    items.clear();
+    cartLength.clear();
+    print('lengthhhhh callll');
     final data = await CustomHttpRequest.getCartItems();
     print("||fetchCategoryDataaaaaaaaaaaaaaaaaaaaaaaaaaaaa $data");
-    CartItem cartItem;
-    for (var item in data) {
+
+    if(mounted){
+      CartItem cartItem;
+      for (var item in data) {
         cartItem = CartItem.fromJson(item);
-        setState(() {
-          items.add(cartItem);
-          length = items.length;
-          print("||Length Dataaaaaaaaaaaaaaaaaaaaaaaaaaaaa $length");
-        });
 
-
+        cartLength.add(cartItem);
+      }
+      setState(() {
+        length = cartLength.length;
+        print('Bug.......... $length');
+      });
     }
-
   }
 
-  /* loadCategoryData() async {
-    print("All data are");
-    final  data = await Provider.of<MyitemsProvider>(context, listen: false)
-        .fetchCategoryData();
-     print(data);
-  }*/
+  Future<void> CartDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Your cart is empty '),
+            content: Text('Please order some food'),
+            elevation: 6,
+            actions: <Widget>[
+              Center(
+                child: TextButton(onPressed: () {
+                  Navigator.pop(context);
+                },
+                  child: Text('Ok'),
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
 
   Future<void> displayTextInputDialog(BuildContext context) async {
     return showDialog(
@@ -99,19 +127,19 @@ class _HomePageState extends State<HomePage> {
           return AlertDialog(
             title: Text('Are you sure want to LogOut ?'),
             actions: <Widget>[
-              TextButton(
+              /* TextButton(
                 // color: Colors.black,
                 // textColor: Colors.white,
                 child: Text('Update Profile'),
                 onPressed: () {
-                  /*Navigator.push(context, MaterialPageRoute(builder: (context){
+                  */ /*Navigator.push(context, MaterialPageRoute(builder: (context){
                     return ProfileUpdate();
-                  }));*/
+                  }));*/ /*
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
                     return ProfileUpdate();
                   }));
                 },
-              ),
+              ),*/
               TextButton(
                 // color: Colors.black,
                 // textColor: Colors.white,
@@ -124,11 +152,12 @@ class _HomePageState extends State<HomePage> {
                 child: Text('OK'),
                 onPressed: () async {
                   SharedPreferences preferences =
-                      await SharedPreferences.getInstance();
+                  await SharedPreferences.getInstance();
                   await preferences.remove('token');
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
-                    return LoginPage();
-                  }));
+                  Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) {
+                        return LoginPage();
+                      }));
                   /*Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
                     return LoginPage();
                   }));*/
@@ -139,6 +168,7 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
+  //for profile info..
   List<Profile> profileData = [];
   Profile profile;
   String name;
@@ -147,11 +177,14 @@ class _HomePageState extends State<HomePage> {
     final data = await CustomHttpRequest.getProfile();
 
     print("User data are $data");
-    profile = Profile.fromJson(data);
+    if (mounted) {
+      profile = Profile.fromJson(data);
 
-    setState(() {
-      name = profile.name;
-    });
+      setState(() {
+        name = profile.name;
+      });
+    }
+
     print(name);
     print(
         '....#####################..................................................................');
@@ -160,21 +193,38 @@ class _HomePageState extends State<HomePage> {
         '.......#############################..........................................................');
   }
 
+  Timer timer;
+
   @override
   void initState() {
     fetchProfile();
     fetchCategoryData();
-    getCartLength();
+    /*setState(() {
+      getCartLength();
+    });*/
+    //timer = Timer.periodic(Duration(seconds: 15), (Timer t) => checkForNewSharedLists());
+    if(mounted){
+      timer = Timer.periodic(Duration(seconds: 2), (timer) {
+        getCartLength();
+      });
+    }
     super.initState();
   }
 
-  /*@override
-   void didChangeDependencies() {
+  @override
+  void dispose() {
+    timer.cancel();
+    pageController.dispose();
+    super.dispose();
+  }
 
-    //loadCategoryData();
-    fetchProfile();
-    fetchCategoryData();
-    getCartLength();
+  /* @override
+   void didChangeDependencies() {
+    print("did change call");
+    setState(() {
+      getCartLength();
+    });
+
 
     super.didChangeDependencies();
 
@@ -183,9 +233,16 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     //categories = Provider.of<MyitemsProvider>(context).category;
+    //length = Provider.of<CartLengthProvider>(context).items;
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double height = MediaQuery
+        .of(context)
+        .size
+        .height;
 
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
         backgroundColor: hBackgroundColor,
@@ -194,8 +251,20 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            onPressed: () {
-              displayTextInputDialog(context);
+            onPressed: () async{
+              SharedPreferences sharedPreferences = await SharedPreferences
+                  .getInstance();
+              token = sharedPreferences.getString("token");
+              print(token);
+              if (token != null) {
+                displayTextInputDialog(context);
+              }else{
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) {
+                  return LoginPage();
+                }));
+              }
+
             },
             icon: SvgPicture.asset("assets/menu.svg"),
           ),
@@ -212,15 +281,30 @@ class _HomePageState extends State<HomePage> {
               children: [
                 IconButton(
                     icon: SvgPicture.asset("assets/cart.svg"),
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return CartPage();
-                      })).then((value){
-                        setState(() {
-                          getCartLength();
-                        });
-                      });
+                    onPressed: () async {
+                      SharedPreferences sharedPreferences = await SharedPreferences
+                          .getInstance();
+                      token = sharedPreferences.getString("token");
+                      print(token);
+                      if (token == null) {
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (context) {
+                          return LoginPage();
+                        }));
+                      }
+                      else {
+                        if (length > 0) {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                                return CartPage();
+                              }));
+                        }
+                        else {
+                          print(
+                              'please select any product,your cart is empty!');
+                          CartDialog(context);
+                        }
+                      }
                     }),
                 Positioned(
                     top: 15,
@@ -234,7 +318,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: Center(
                         child: Text(
-                          items.isEmpty? "0": items.length.toString(),
+                          cartLength.isEmpty ? "0" : length.toString(),
                           style: TextStyle(fontSize: 8, color: Colors.black),
                         ),
                       ),
@@ -307,7 +391,7 @@ class _HomePageState extends State<HomePage> {
                                       color: hHighlightTextColor, fontSize: 14),
                                 ),
                                 Text(
-                                  "$name!",
+                                  "${name ?? 'user'}!",
                                   style: TextStyle(
                                       color: hHighlightTextColor, fontSize: 14),
                                 ),
@@ -316,26 +400,51 @@ class _HomePageState extends State<HomePage> {
                             Text(
                               'What food do you want?',
                               style:
-                                  TextStyle(color: kwhiteColor, fontSize: 15),
+                              TextStyle(color: kwhiteColor, fontSize: 15),
                             ),
                             SizedBox(
                               height: 10,
                             ),
-                            Container(
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      gapPadding: 5.0,
-                                      borderSide: BorderSide(
-                                          color: hHighlightTextColor,
-                                          width: 2.5),
-                                    ),
-                                    hintText: 'Searching...',
-                                    hintStyle: TextStyle(fontSize: 14),
-                                    suffixIcon: Icon(Icons.search)),
+                            TextButton(
+                              onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context){
+                                  return SearchPage();
+                                }));
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                height: 50,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text('Search..',style: TextStyle(color: Colors.black87),),
+                                    Spacer(),
+                                    Icon(Icons.search,color: Colors.black87,),
+                                  ],
+                                ),
+                                /*child: TextFormField(
+                                  onTap: (){
+
+                                  },
+                                  decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        gapPadding: 5.0,
+                                        borderSide: BorderSide(
+                                            color: hHighlightTextColor,
+                                            width: 2.5),
+                                      ),
+                                      hintText: 'Searching...',
+                                      hintStyle: TextStyle(fontSize: 14),
+                                      suffixIcon: Icon(Icons.search)),
+                                ),*/
                               ),
                             ),
                           ],
@@ -365,8 +474,8 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       for (int i = 0; i < categories.length; i++)
                         InkWell(
-                          onTap: (){
-                            getCartLength();
+                          onTap: () {
+                            getCartLength().then((value) => getCartLength());
                           },
                           child: ShowItemsByCategory(
                             id: categories[i].id,

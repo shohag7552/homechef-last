@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_chef/constant.dart';
+import 'package:home_chef/screens/login_page.dart';
 import 'package:home_chef/server/http_request.dart';
 import 'package:home_chef/widgets/mainPage.dart';
 import 'package:home_chef/widgets/spin_kit.dart';
@@ -35,6 +36,7 @@ class DetailsProductsPage extends StatefulWidget {
 class _DetailsProductsPageState extends State<DetailsProductsPage> {
 
   PageController pageController = PageController();
+  String token;
 
   bool onProgress = false;
   int count = 1;
@@ -114,7 +116,8 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    double price = double.parse(widget.originalPrice);
+    double discountPrice = double.parse(widget.discountPrice);
+    double orginalPrice = double.parse(widget.originalPrice);
 
     int item_id = widget.id;
 
@@ -135,7 +138,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
         backgroundColor: kwhiteColor,
         body: ModalProgressHUD(
           inAsyncCall: onProgress,
-          opacity: 0.1,
+          opacity: 0.2,
           progressIndicator: Spin(),
           child: Stack(children: [
             Column(
@@ -250,7 +253,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                           ),
                           // Details.....
 
-                          Container(
+                          /*Container(
                             height: 100,
                             //child: Expanded(
                               child: Text(
@@ -264,7 +267,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                                 ),
                               ),
                            // ),
-                          ),
+                          ),*/
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01,
                           ),
@@ -328,7 +331,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                         Spacer(),
 
                         Text(
-                          '${widget.discountPrice}',
+                          '\৳${orginalPrice * count}',
                           style: TextStyle(
                             color: hTextColor.withOpacity(0.4),
                             decoration: TextDecoration.lineThrough,
@@ -339,7 +342,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                           width: 10,
                         ),
                         Text(
-                          '${price * count}',
+                          '\৳ ${discountPrice * count}',
                           //"${widget.products.price * count}",
                           style: TextStyle(
                               fontSize: 22, fontWeight: FontWeight.w700),
@@ -373,13 +376,27 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
                           child: TextButton(
-                            onPressed: () {
-                              print('add to card cllllllllllllllick');
+                            onPressed: () async {
+                              print('add to card clllllllick');
+                              SharedPreferences sharedPreferences;
 
-                              AddToCard(context,item_id,count);
-                              setState(() {
-                                onProgress = true;
-                              });
+                                sharedPreferences = await SharedPreferences.getInstance();
+                                token = sharedPreferences.getString("token");
+                                print(token);
+
+
+                              if(token == null){
+                                Navigator.push(context, MaterialPageRoute(builder: (context){
+                                  return LoginPage();
+                                }));
+                              }else{
+
+                                AddToCard(context,item_id,count);
+                                setState(() {
+                                  onProgress = true;
+                                });
+                              }
+
 
 
                               // Navigator.pushReplacement(context,

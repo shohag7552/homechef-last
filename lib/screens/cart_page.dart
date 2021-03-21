@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_chef/model/cartItems.dart';
 import 'package:home_chef/screens/checkout_page.dart';
 import 'package:home_chef/server/http_request.dart';
+import 'package:home_chef/widgets/mainPage.dart';
 import 'package:home_chef/widgets/spin_kit.dart';
 
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -65,6 +66,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   Future<dynamic> fetchCategoryData() async {
+
     final data = await CustomHttpRequest.getCartItems();
     print("||fetchCategoryData $data");
     CartItem cartItem;
@@ -72,10 +74,6 @@ class _CartPageState extends State<CartPage> {
       try {
         cartItem = CartItem.fromJson(item);
         items.firstWhere((element) => element.id == cartItem.id);
-        if(items.length == null){
-          print('empty');
-          showInSnackBar(value: 'Empty cart',color: Colors.yellow);
-        }
       } catch (e) {
         if (mounted) {
           setState(() {
@@ -84,20 +82,12 @@ class _CartPageState extends State<CartPage> {
         }
       }
     }
+    if(items.length == 0){
+      print('empty');
+      showInSnackBar(value: 'Empty cart',color: Colors.yellow);
+    }
     calcTotalPrice();
 
-  }
-
-
-
-  double total;
-  _getTotal(){
-    total = 0.0;
-    items.forEach((item) {
-      setState(() {
-        total+=(double.parse(item.price) * int.parse(item.quantity));
-      });
-    });
   }
 
   calcTotalPrice(){
@@ -136,6 +126,27 @@ class _CartPageState extends State<CartPage> {
       ),
       backgroundColor: color,
     ));
+  }
+
+  Future<void> CartDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Your cart is empty '),
+            content: Text('Please order some food'),
+            elevation: 6,
+            actions: <Widget>[
+              Center(
+                child: TextButton(onPressed: () {
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> MainPage()));
+                },
+                  child: Text('Ok'),
+                ),
+              ),
+            ],
+          );
+        });
   }
 
   @override
@@ -240,7 +251,7 @@ class _CartPageState extends State<CartPage> {
               flex: 10,
               child: ModalProgressHUD(
                 inAsyncCall: onProgress,
-                opacity: 0.1,
+                opacity: 0.2,
                 // progressIndicator: Spin(),
                 child: Container(
                   child: items.isNotEmpty ? ListView.builder(
@@ -381,6 +392,9 @@ class _CartPageState extends State<CartPage> {
 
                                         });
                                         calcTotalPrice();
+                                        if(items.length==0){
+                                          CartDialog(context);
+                                        }
                                         //showInSnackBar("1 Item Delete",);
                                         //showInSnackBar(value: 'Delete Successfully',color: Colors.red);
                                         print("item delete.................");
@@ -389,14 +403,16 @@ class _CartPageState extends State<CartPage> {
                                       },
                                     ),
                                     SizedBox(
-                                      height: 10,
+                                      height: 8,
                                     ),
-                                    Text(
-                                      items[index].totalPrice,
-                                      style: TextStyle(
-                                          color: cTextColor,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 16),
+                                    Expanded(
+                                      child: Text(
+                                        "\৳ ${items[index].totalPrice}",
+                                        style: TextStyle(
+                                            color: cTextColor,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16),
+                                      ),
                                     ),
                                   ],
                                 )
@@ -413,13 +429,14 @@ class _CartPageState extends State<CartPage> {
               ),
             ),
             Expanded(
-              flex: 6,
+              //flex: 6,
+              flex: 2,
               child: Container(
                 child: Column(
                   //crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Expanded(
+                    /*Expanded(
                       flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
@@ -441,7 +458,8 @@ class _CartPageState extends State<CartPage> {
                         ),
                       ),
                     ),
-                    Expanded(
+                    */
+                    /*Expanded(
                       flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
@@ -462,7 +480,7 @@ class _CartPageState extends State<CartPage> {
                           ],
                         ),
                       ),
-                    ),
+                    ),*/
                     //coupon....
                     /*Expanded(
                       flex: 1,
@@ -496,7 +514,7 @@ class _CartPageState extends State<CartPage> {
                         ),
                       ),
                     ),*/
-                    Divider(),
+                    //Divider(),
                     Expanded(
                       flex: 1,
                       child: Padding(
@@ -510,7 +528,7 @@ class _CartPageState extends State<CartPage> {
                             ),
                             Spacer(),
                             Text(
-                              totalPrice.toString(),
+                              "\৳ $totalPrice",
                               style: TextStyle(
                                   color: cBlackColor,
                                   fontSize: 20,
@@ -533,7 +551,7 @@ class _CartPageState extends State<CartPage> {
                             handleUpdateCart();
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return CheckoutPage();
+                              return CheckoutPage(totalPrice: totalPrice);
                             }));
                           },
                           child: Row(
@@ -563,7 +581,8 @@ class _CartPageState extends State<CartPage> {
       ),
     );
   }
-}/*
+}
+/*
 
 class ProductsCard extends StatelessWidget {
   final int index;

@@ -45,6 +45,17 @@ class CustomHttpRequest {
       print(e);
       return {"error": "Something Wrong Exception"};
     }
+  }  static Future<dynamic> getShippingAddress(int id) async {
+    try {
+      var response = await http.get(
+        "$uri/api/order/shipping/address/$id",headers: await getHeaderWithToken()
+      );
+      final data = jsonDecode(response.body);
+      return data;
+    } catch (e) {
+      print(e);
+      return {"error": "Something Wrong Exception"};
+    }
   }
 
  static Future<dynamic> getCartItems()async{
@@ -81,6 +92,22 @@ class CustomHttpRequest {
       var response = await http.get(
         "$uri/api/user/order/$id/summary",
         headers: await getHeaderWithToken() ,
+      );
+      final data = jsonDecode(response.body);
+      print(data);
+      if (response.statusCode == 200)
+        return data;
+      else
+        return "error";
+    } catch (e) {
+      print(e);
+      return "User details data not found";
+    }
+  } static Future<dynamic> searchItenDetails(int id) async {
+    try {
+      var response = await http.get(
+        "$uri/api/product/$id/view",
+        headers: defaultHeader ,
       );
       final data = jsonDecode(response.body);
       print(data);
