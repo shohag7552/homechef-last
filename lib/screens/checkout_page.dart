@@ -239,16 +239,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
         proZip =profile.billingAddress.zipCode.toString();
       });
     }
-    nameSheetController.text = proName;
-    houseSheetController.text =proHouseNumber;
-    roadSheetController.text =proRoadNumber;
-    emailSheetController.text =proEmail;
-    contactSheetController.text =proContact;
-    areaSheetController.text = proArea;
-    appartmentSheetController.text = proAppertment;
-    zipSheetController.text = proZip;
-    sheetDistrict = profile.billingAddress.district.toString();
+    if(profile.billingAddress.house != null){
 
+      nameSheetController.text = proName;
+      houseSheetController.text =proHouseNumber;
+      roadSheetController.text =proRoadNumber;
+      emailSheetController.text =proEmail;
+      contactSheetController.text =proContact;
+      areaSheetController.text = proArea;
+      appartmentSheetController.text = proAppertment;
+      zipSheetController.text = proZip;
+      sheetDistrict = profile.billingAddress.district.toString();
+
+    }if(profile.billingAddress.house == null){
+
+      nameSheetController.text = proName;
+
+      emailSheetController.text =proEmail;
+      contactSheetController.text =proContact;
+
+    }
   }
 
   @override

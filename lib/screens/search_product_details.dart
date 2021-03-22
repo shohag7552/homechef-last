@@ -140,7 +140,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
     double discountPrice = fullItems != null ? double.parse(fullItems.price[0].discountedPrice) : null;
     double orginalPrice = fullItems != null ? double.parse(fullItems.price[0].originalPrice) : null;
 
-    int item_id = fullItems != null ?widget.id: "";
+    int item_id = widget.id;
 
     List<Widget> images = [
       Image.network(
@@ -351,7 +351,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                         Spacer(),
 
                         Text(
-                          '\৳${orginalPrice * count}',
+                          '\৳${fullItems != null ? orginalPrice * count :''}',
                           style: TextStyle(
                             color: hTextColor.withOpacity(0.4),
                             decoration: TextDecoration.lineThrough,
@@ -362,7 +362,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                           width: 10,
                         ),
                         Text(
-                          '\৳ ${discountPrice * count}',
+                          '\৳ ${fullItems != null ? discountPrice * count : ''}',
                           //"${widget.products.price * count}",
                           style: TextStyle(
                               fontSize: 22, fontWeight: FontWeight.w700),
@@ -417,14 +417,6 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                                 });
                               }
 
-
-
-                              // Navigator.pushReplacement(context,
-                              //     MaterialPageRoute(builder: (context) => MainPage()));
-                            /*  Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) {
-                                        return CartPage();
-                                      }));*/
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,

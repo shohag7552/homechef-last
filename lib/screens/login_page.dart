@@ -150,12 +150,23 @@ class _LoginPageState extends State<LoginPage> {
                           SizedBox(
                             height: 20,
                           ),
-                          Text(
-                            'Hay!',
-                            style: fontStyle(
-                                size: 22,
-                                color: hHighlightTextColor,
-                                fontWeight: FontWeight.w800),
+                          Row(
+                            children: [
+                              Text(
+                                'Hay!',
+                                style: fontStyle(
+                                    size: 22,
+                                    color: hHighlightTextColor,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                              Text(
+                                ' You need to login first.',
+                                style: fontStyle(
+                                    size: 22,
+                                    color: hHighlightTextColor,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            ],
                           ),
                           SizedBox(
                             height: 10,

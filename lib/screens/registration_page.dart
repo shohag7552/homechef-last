@@ -503,12 +503,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         if (value.isEmpty) {
                           return "Confirm Password required ";
                         }
-                        if (value.length < 6) {
-                          return "Password Too Short";
-                        }
-                        if (value.length > 15) {
-                          return "Password Too long ( 6 - 15 character )";
-                        }
                         if (passwordController.text !=
                             confirmPassController.text) {
                           return "Password do not match";
