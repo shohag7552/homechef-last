@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_chef/bottom_navigation/search_page.dart';
 import 'package:home_chef/categories_pages/show_items_by_category.dart';
 import 'package:home_chef/constant.dart';
+import 'package:home_chef/model/SearchProduct_model.dart';
 import 'package:home_chef/model/cartItems.dart';
 import 'package:home_chef/model/category_model.dart';
 import 'package:home_chef/model/profile_model.dart';
@@ -16,6 +18,7 @@ import 'package:home_chef/screens/login_page.dart';
 import 'package:home_chef/server/http_request.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   static const String id = 'HomePage';
@@ -195,14 +198,49 @@ class _HomePageState extends State<HomePage> {
 
   Timer timer;
 
+  //search item
+  List<Search> list = [];
+
+  Future fatchItems() async {
+    final uri = Uri.parse(
+        "https://apihomechef.masudlearn.com/api/product/search?name=");
+
+    var request = http.Request("POST", uri);
+    request.headers.addAll(await CustomHttpRequest.defaultHeader);
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+
+    var responseString = String.fromCharCodes(responseData);
+
+    print("responseBody1 " + responseString);
+    var data = jsonDecode(responseString);
+    //search = Search.fromJson(data);
+    print("print all search is : $data");
+    for (var entry in data) {
+      Search search = Search(
+        id: entry['id'],
+        name: entry['name'],
+        image: entry['image'],
+      );
+      try {
+        print("all data ${entry['name']}");
+        list.firstWhere((element) => element.id == entry['id']);
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            list.add(search);
+          });
+        }
+      }
+    }
+
+  }
+
   @override
   void initState() {
     fetchProfile();
     fetchCategoryData();
-    /*setState(() {
-      getCartLength();
-    });*/
-    //timer = Timer.periodic(Duration(seconds: 15), (Timer t) => checkForNewSharedLists());
+    fatchItems();
     if(mounted){
       timer = Timer.periodic(Duration(seconds: 2), (timer) {
         getCartLength();
@@ -217,18 +255,6 @@ class _HomePageState extends State<HomePage> {
     pageController.dispose();
     super.dispose();
   }
-
-  /* @override
-   void didChangeDependencies() {
-    print("did change call");
-    setState(() {
-      getCartLength();
-    });
-
-
-    super.didChangeDependencies();
-
-   }*/
 
   @override
   Widget build(BuildContext context) {
@@ -340,34 +366,7 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.white,
                   child: Column(
                     children: [
-                      /*Padding(
-                        // padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
-                        padding:
-                        EdgeInsets.only(left: 15, right: 15, bottom: 10),
-                        child: Row(
-                          //App Bar items........
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: SvgPicture.asset("assets/menu.svg"),
-                            ),
-                            Container(
-                              height: 60,
-                              width: 70,
-                              child: Image.asset(
-                                'assets/logo.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            IconButton(icon: SvgPicture.asset("assets/cart.svg"), onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context){
-                                return CartPage();
-                              }));
-                            }),
-                          ],
-                        ),
-                      ),*/
+
                       SizedBox(
                         height: 10,
                       ),
@@ -407,9 +406,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                             TextButton(
                               onPressed: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context){
-                                  return SearchPage();
-                                }));
+                                showSearch(context: context, delegate: SearchHere(itemsList: list));
+
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
@@ -427,24 +425,7 @@ class _HomePageState extends State<HomePage> {
                                     Icon(Icons.search,color: Colors.black87,),
                                   ],
                                 ),
-                                /*child: TextFormField(
-                                  onTap: (){
 
-                                  },
-                                  decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10.0),
-                                        gapPadding: 5.0,
-                                        borderSide: BorderSide(
-                                            color: hHighlightTextColor,
-                                            width: 2.5),
-                                      ),
-                                      hintText: 'Searching...',
-                                      hintStyle: TextStyle(fontSize: 14),
-                                      suffixIcon: Icon(Icons.search)),
-                                ),*/
                               ),
                             ),
                           ],
