@@ -14,7 +14,9 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class CheckoutPage extends StatefulWidget {
   double totalPrice;
+
   CheckoutPage({this.totalPrice});
+
   @override
   _CheckoutPageState createState() => _CheckoutPageState();
 }
@@ -33,11 +35,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String districtType;
   String sheetDistrict;
   List<String> _getStorageHub = ['Dhaka', 'Chittagong'];
-  List<String> _getDistrict = ['Cumilla', 'Feni', 'narayngang','Dhanmondi'];
+  List<String> _getDistrict = ['Cumilla', 'Feni', 'narayngang', 'Dhanmondi'];
 
   //black card items...
   String home, house, road, area, district;
-
 
   TextEditingController houseSheetController = TextEditingController();
   TextEditingController roadSheetController = TextEditingController();
@@ -57,17 +58,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
   TextEditingController appertmentController = TextEditingController();
   TextEditingController zipController = TextEditingController();
 
-
-
-
   bool isCheck = false;
 
   bool isBilling = false;
   bool isShipping = false;
+
   Future billingAdded() async {
     // if (isShipping == true) {
     final uri =
-    Uri.parse("https://apihomechef.masudlearn.com/api/update/profile");
+        Uri.parse("https://apihomechef.masudlearn.com/api/update/profile");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
 
@@ -88,8 +87,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
     var responseString = String.fromCharCodes(responseData);
     setState(() {
       Navigator.pop(context);
-      showInToast(responseString);
+      // showInToast(responseString);
     });
+    var data = jsonDecode(responseString);
+    showInToast(data['message']);
     print("responseBody " + responseString);
 
     if (response.statusCode == 201) {
@@ -97,7 +98,86 @@ class _CheckoutPageState extends State<CheckoutPage> {
       var data = jsonDecode(responseString);
       print('oooooooooooooooooooo');
       print(data);
+      // showInToast(data['message']);
+      setState(() {
+        onProgress = false;
+      });
+    } else {
+      setState(() {
+        onProgress = false;
+        //showInToast(data['error']);
+      });
 
+      var errorr = jsonDecode(responseString.trim().toString());
+      //showInToast(errorr);
+      // showInSnackBar("Registered Failed, ${errorr}");
+      print("profile update failed " + errorr);
+    }
+  }
+
+  Future postShipingAddress() async {
+    final uri = Uri.parse("https://apihomechef.masudlearn.com/api/place/order");
+    var request = http.MultipartRequest("POST", uri);
+    request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
+
+    request.fields['payment_type_id'] = payment_id.toString();
+
+    /*if(isSameBillingAddress == false && nameSheetController.text.toString() == null){
+        showInToast('please submit the shipping address');
+      }*/
+
+    if (isSameBillingAddress) {
+      request.fields['shipping_address'] = 'same';
+      request.fields['area'] = profile.billingAddress.area ?? "area";
+      request.fields['contact'] = profile.billingAddress.contact ?? "area";
+      request.fields['appartment'] =
+          profile.billingAddress.appartment ?? "appartment";
+      request.fields['house'] = profile.billingAddress.house ?? "house";
+      request.fields['road'] = profile.billingAddress.road ?? "road";
+      request.fields['city'] = profile.billingAddress.city ?? "city";
+      request.fields['district'] =
+          profile.billingAddress.district ?? "district";
+      request.fields['zip_code'] = profile.billingAddress.zipCode ?? "zip_code";
+    } else {
+      request.fields['shipping_area'] = areaController.text.toString();
+      request.fields['shipping_contact'] = contactController.text.toString();
+      request.fields['shipping_appartment'] =
+          appertmentController.text.toString();
+      request.fields['shipping_zip_code'] = zipController.text.toString();
+      request.fields['shipping_house'] = houseController.text.toString();
+      request.fields['shipping_road'] = roadController.text.toString();
+      request.fields['shipping_city'] = cityType.toString();
+      // print('shipping city added to city :${cityType.toString()} ');
+      request.fields['shipping_district'] = districtType.toString();
+    }
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    print("responseBody " + responseString);
+    if (response.statusCode == 201) {
+      print("responseBody1 " + responseString);
+      var data = jsonDecode(responseString);
+      print('oooooooooooooooooooo');
+      print(data);
+      print('Reply message ......: ');
+      //showInToast(responseString);
+      showInToast(data['message'].toString());
+
+      orderId = data["order_id"];
+      print(orderId);
+      if (orderId != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return FinalCheckoutPage(
+              order_id: orderId,
+            );
+          }),
+        );
+      } else {
+        showInToast('please fill the shipping address');
+      }
 
       setState(() {
         onProgress = false;
@@ -105,86 +185,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
     } else {
       setState(() {
         onProgress = false;
+        showInToast('please fill the shipping address');
       });
 
       var errorr = jsonDecode(responseString.trim().toString());
-      // showInSnackBar("Registered Failed, ${errorr}");
-      print("profile update failed " + errorr);
+      print("Registered failed " + errorr);
     }
   }
 
-  Future postShipingAddress() async {
-      final uri = Uri.parse("https://apihomechef.masudlearn.com/api/place/order");
-      var request = http.MultipartRequest("POST", uri);
-      request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
-
-      request.fields['payment_type_id'] = payment_id.toString();
-
-
-      if(isSameBillingAddress){
-        request.fields['shipping_address'] = 'same';
-        request.fields['area'] = profile.billingAddress.area ?? "area";
-        request.fields['contact'] = profile.billingAddress.contact ?? "area";
-        request.fields['appartment'] = profile.billingAddress.appartment ?? "appartment";
-        request.fields['house'] = profile.billingAddress.house ?? "house";
-        request.fields['road'] = profile.billingAddress.road ?? "road";
-        request.fields['city'] = profile.billingAddress.city ?? "city";
-        request.fields['district'] = profile.billingAddress.district ?? "district";
-        request.fields['zip_code'] = profile.billingAddress.zipCode ?? "zip_code";
-      }
-      else {
-        request.fields['shipping_area'] = areaController.text.toString();
-        request.fields['shipping_contact'] = contactController.text.toString();
-        request.fields['shipping_appartment'] = appertmentController.text.toString();
-        request.fields['shipping_zip_code'] = zipController.text.toString();
-        request.fields['shipping_house'] = houseController.text.toString();
-        request.fields['shipping_road'] = roadController.text.toString();
-        request.fields['shipping_city'] = cityType.toString();
-        // print('shipping city added to city :${cityType.toString()} ');
-        request.fields['shipping_district'] = districtType.toString();
-
-      }
-
-      var response = await request.send();
-      var responseData = await response.stream.toBytes();
-      var responseString = String.fromCharCodes(responseData);
-      print("responseBody " + responseString);
-      if (response.statusCode == 201) {
-        print("responseBody1 " + responseString);
-        var data = jsonDecode(responseString);
-        print('oooooooooooooooooooo');
-        print(data);
-        showInToast(responseString);
-
-        orderId = data["order_id"];
-        print(orderId);
-        if (orderId != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) {
-              return FinalCheckoutPage(
-                order_id: orderId,
-              );
-            }),
-          );
-        } else {
-          showInToast('please fill the shipping address');
-        }
-
-        setState(() {
-          onProgress = false;
-        });
-      } else {
-        setState(() {
-          onProgress = false;
-        });
-
-        var errorr = jsonDecode(responseString.trim().toString());
-        print("Registered failed " + errorr);
-      }
-
-  }
-  showInToast(String value){
+  showInToast(String value) {
     Fluttertoast.showToast(
         msg: "$value",
         toastLength: Toast.LENGTH_SHORT,
@@ -192,8 +201,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         timeInSecForIosWeb: 1,
         backgroundColor: hHighlightTextColor,
         textColor: Colors.white,
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -211,8 +219,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     ));
   }
 
-  List<Profile> profileData=[];
-  Profile profile ;
+  List<Profile> profileData = [];
+  Profile profile;
+
   String proHouseNumber;
   String proRoadNumber;
   String proName;
@@ -223,41 +232,43 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String proZip;
 
   Future<dynamic> fetchProfile() async {
+    setState(() {
+      onProgress = true;
+    });
     final data = await CustomHttpRequest.getProfile();
 
     print("User data are $data");
     profile = Profile.fromJson(data);
-    if(mounted){
+    if (mounted) {
       setState(() {
+        onProgress = false;
+
         proHouseNumber = profile.billingAddress.house.toString();
         proRoadNumber = profile.billingAddress.road.toString();
         proName = profile.name.toString();
         proEmail = profile.email.toString();
-        proContact =profile.contact.toString();
-        proArea =profile.billingAddress.area.toString();
-        proAppertment =profile.billingAddress.appartment.toString();
-        proZip =profile.billingAddress.zipCode.toString();
+        proContact = profile.contact.toString();
+        proArea = profile.billingAddress.area.toString();
+        proAppertment = profile.billingAddress.appartment.toString();
+        proZip = profile.billingAddress.zipCode.toString();
       });
     }
-    if(profile.billingAddress.house != null){
-
+    if (profile.billingAddress.house != null) {
       nameSheetController.text = proName;
-      houseSheetController.text =proHouseNumber;
-      roadSheetController.text =proRoadNumber;
-      emailSheetController.text =proEmail;
-      contactSheetController.text =proContact;
+      houseSheetController.text = proHouseNumber;
+      roadSheetController.text = proRoadNumber;
+      emailSheetController.text = proEmail;
+      contactSheetController.text = proContact;
       areaSheetController.text = proArea;
       appartmentSheetController.text = proAppertment;
       zipSheetController.text = proZip;
       sheetDistrict = profile.billingAddress.district.toString();
-
-    }if(profile.billingAddress.house == null){
-
+    }
+    if (profile.billingAddress.house == null) {
       nameSheetController.text = proName;
 
-      emailSheetController.text =proEmail;
-      contactSheetController.text =proContact;
-
+      emailSheetController.text = proEmail;
+      contactSheetController.text = proContact;
     }
   }
 
@@ -267,6 +278,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     super.initState();
   }
+
   @override
   void dispose() {
     houseSheetController.dispose();
@@ -286,7 +298,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     districController.dispose();
     appertmentController.dispose();
     zipController.dispose();
-
 
     super.dispose();
   }
@@ -360,17 +371,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'House',
                                         style: TextStyle(
                                             fontSize: 14,
-                                            color: Colors.white.withOpacity(0.5)),
+                                            color:
+                                                Colors.white.withOpacity(0.5)),
                                       ),
-                                      SizedBox(height: 3,),
+                                      SizedBox(
+                                        height: 3,
+                                      ),
                                       Visibility(
-                                        visible: profile != null && profile.billingAddress.house != null,
+                                        visible: profile != null &&
+                                            profile.billingAddress.house !=
+                                                null,
                                         child: Row(
                                           children: [
                                             Text(
@@ -399,7 +416,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                                 Spacer(),
                                 IconButton(
-                                  onPressed: (){
+                                  onPressed: () {
                                     showModalBottomSheet(
                                         context: context,
                                         isScrollControlled: true,
@@ -411,7 +428,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   icon: Text(
                                     'Edit',
                                     style: TextStyle(
-                                        color: hHighlightTextColor, fontSize: 12),
+                                        color: hHighlightTextColor,
+                                        fontSize: 12),
                                   ),
                                 )
                               ],
@@ -431,8 +449,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             // isBilling = isCheck;
                             isSameBillingAddress = !isSameBillingAddress;
                           });
-                          if(isSameBillingAddress && profile.billingAddress.house == null){
-
+                          if (isSameBillingAddress &&
+                              profile.billingAddress.house == null) {
                             Future<void> future = showModalBottomSheet(
                                 context: context,
                                 isScrollControlled: true,
@@ -440,8 +458,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 builder: (BuildContext context) {
                                   return bottomSheet(context);
                                 });
-                            future.then((void value){
-                              if(isSameBillingAddress && profile.billingAddress.house == null){
+                            future.then((void value) {
+                              if (isSameBillingAddress &&
+                                  profile.billingAddress.house == null) {
                                 setState(() {
                                   isSameBillingAddress = false;
                                   fetchProfile();
@@ -458,7 +477,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 height: 20,
                                 width: 20,
                                 decoration: BoxDecoration(
-                                  color: isSameBillingAddress ? kBlackColor : kwhiteColor,
+                                  color: isSameBillingAddress
+                                      ? kBlackColor
+                                      : kwhiteColor,
                                   border: Border.all(color: cBlackColor),
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(20),
@@ -477,7 +498,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               Text(
                                 'Same as billing address',
                                 style: TextStyle(
-                                  color: isSameBillingAddress ? kBlackColor : Colors.black45,
+                                  color: isSameBillingAddress
+                                      ? kBlackColor
+                                      : Colors.black45,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -494,8 +517,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         visible: !isSameBillingAddress,
                         child: Container(
                           color: kPrimaryColor,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 20),
                           child: Column(
                             children: [
                               RegiTextField(
@@ -507,7 +530,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 height: 10,
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Expanded(
                                       child: RegiTextField(
@@ -530,7 +554,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 height: 10,
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Expanded(
                                       child: RegiTextField(
@@ -586,14 +611,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                 horizontal: 16, vertical: 20),
                                             decoration: BoxDecoration(
                                                 border: Border.all(
-                                                    color: Colors.grey, width: 1),
+                                                    color: Colors.grey,
+                                                    width: 1),
                                                 borderRadius:
-                                                    BorderRadius.circular(10.0)),
+                                                    BorderRadius.circular(
+                                                        10.0)),
                                             //margin: EdgeInsets.only(top: 20),
                                             height: 60,
                                             child: Center(
-                                              child:
-                                                  DropdownButtonFormField<String>(
+                                              child: DropdownButtonFormField<
+                                                  String>(
                                                 icon: Icon(
                                                   Icons.keyboard_arrow_down,
                                                   size: 25,
@@ -629,8 +656,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                           color: kBlackColor,
                                                           fontSize: 14),
                                                     ),
-                                                    onTap: () {
-                                                    },
+                                                    onTap: () {},
                                                   );
                                                 }).toList(),
                                               ),
@@ -667,14 +693,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                                             decoration: BoxDecoration(
                                                 border: Border.all(
-                                                    color: Colors.grey, width: 1),
+                                                    color: Colors.grey,
+                                                    width: 1),
                                                 borderRadius:
-                                                    BorderRadius.circular(10.0)),
+                                                    BorderRadius.circular(
+                                                        10.0)),
                                             //margin: EdgeInsets.only(top: 20),
                                             height: 60,
                                             child: Center(
-                                              child:
-                                                  DropdownButtonFormField<String>(
+                                              child: DropdownButtonFormField<
+                                                  String>(
                                                 icon: Icon(
                                                   Icons.keyboard_arrow_down,
                                                   size: 25,
@@ -710,8 +738,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                           color: kBlackColor,
                                                           fontSize: 14),
                                                     ),
-                                                    onTap: () {
-                                                    },
+                                                    onTap: () {},
                                                   );
                                                 }).toList(),
                                               ),
@@ -751,7 +778,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 height: 10,
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
                                     onTap: () {
@@ -771,8 +799,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                               color: isCashPay
                                                   ? kBlackColor
                                                   : kwhiteColor,
-                                              border:
-                                                  Border.all(color: cBlackColor),
+                                              border: Border.all(
+                                                  color: cBlackColor),
                                               borderRadius: BorderRadius.all(
                                                 Radius.circular(20),
                                               ),
@@ -819,8 +847,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                               color: isCardPay
                                                   ? kBlackColor
                                                   : kwhiteColor,
-                                              border:
-                                                  Border.all(color: cBlackColor),
+                                              border: Border.all(
+                                                  color: cBlackColor),
                                               borderRadius: BorderRadius.all(
                                                 Radius.circular(20),
                                               ),
@@ -867,8 +895,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                               color: isBkashPay
                                                   ? kBlackColor
                                                   : kwhiteColor,
-                                              border:
-                                                  Border.all(color: cBlackColor),
+                                              border: Border.all(
+                                                  color: cBlackColor),
                                               borderRadius: BorderRadius.all(
                                                 Radius.circular(20),
                                               ),
@@ -968,7 +996,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       borderRadius: BorderRadius.circular(10.0),
                                       // gapPadding: 5.0,
                                       borderSide: BorderSide(
-                                          color: hHighlightTextColor, width: 2.5),
+                                          color: hHighlightTextColor,
+                                          width: 2.5),
                                     ),
                                     hintText: 'Write here',
                                     hintStyle: TextStyle(fontSize: 14),
@@ -1004,7 +1033,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               Divider(),
 
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Total Price',
@@ -1039,6 +1069,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 child: TextButton(
                                   onPressed: () {
                                     postShipingAddress();
+                                    if (isSameBillingAddress == false &&
+                                        nameSheetController.text.toString() == null) {
+                                      showInToast(
+                                          'please submit the shipping address');
+                                    }
                                     print('place order');
                                     // justTry();
                                     setState(() {
@@ -1085,7 +1120,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('Create Billing Address',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16),),
+            Text(
+              'Create Billing Address',
+              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+            ),
             SizedBox(
               height: 10,
             ),
@@ -1093,7 +1131,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
               name: 'contact',
               hint: 'contact number',
               controller: contactSheetController,
-
             ),
             Row(
               children: [
@@ -1109,10 +1146,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 Expanded(
                     child: RegiTextField(
-                      name: 'Email',
-                      hint: 'your email',
-                      controller: emailSheetController,
-                    )),
+                  name: 'Email',
+                  hint: 'your email',
+                  controller: emailSheetController,
+                )),
               ],
             ),
             SizedBox(
@@ -1123,19 +1160,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
               children: [
                 Expanded(
                     child: RegiTextField(
-                      name: 'Appartment',
-                      hint: 'your appartment',
-                      controller: appartmentSheetController,
-                    )),
+                  name: 'Appartment',
+                  hint: 'your appartment',
+                  controller: appartmentSheetController,
+                )),
                 SizedBox(
                   width: 5,
                 ),
                 Expanded(
                     child: RegiTextField(
-                      name: 'Zip-code',
-                      hint: '125-10',
-                      controller: zipSheetController,
-                    )),
+                  name: 'Zip-code',
+                  hint: '125-10',
+                  controller: zipSheetController,
+                )),
               ],
             ),
             SizedBox(
@@ -1329,7 +1366,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               child: TextButton(
                 onPressed: () {
-
                   billingAdded();
                 },
                 child: Center(

@@ -90,6 +90,9 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
 
   Future<dynamic> fetchSubCategories(int id) async {
     //print(" item id issss: ${widget.id}");
+    setState(() {
+      onProgress = true;
+    });
     final data = await CustomHttpRequest.searchItenDetails(id);
 
     //items = cast<Items>(data);
@@ -104,10 +107,14 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
 
     try {
       item.firstWhere((element) => element.id == fullItems.id);
+      setState(() {
+        onProgress = false;
+      });
     } catch (e) {
       if (mounted) {
         setState(() {
           item.add(fullItems);
+          onProgress = false;
           print(" search cat.............$item");
         });
       }

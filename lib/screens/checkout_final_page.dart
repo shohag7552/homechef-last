@@ -54,7 +54,9 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
     final data = await CustomHttpRequest.getProfile();
 
     print("User data are $data");
-    profile = Profile.fromJson(data);
+    setState(() {
+      profile = Profile.fromJson(data);
+    });
     print(
         '....#####################..................................................................');
     print(profile);
@@ -67,7 +69,9 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
     final data = await CustomHttpRequest.getShippingAddress(id);
 
     print("User data are $data");
-    shipping = Shipping.fromJson(data);
+    setState(() {
+      shipping = Shipping.fromJson(data);
+    });
     print(
         '....#####################..................................................................');
     print(shipping);

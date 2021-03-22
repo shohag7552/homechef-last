@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_chef/bottom_navigation/search_page.dart';
@@ -28,13 +29,45 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // List<String> categories = [
-  //   "All",
-  //   "Burgers",
-  //   "Pizza",
-  //   "Hot dog",
-  //   "Chicken fry"
-  // ];
+
+  //internet connection
+  Future<bool> check() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      return true;
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      return true;
+    }
+    return false;
+  }
+  Future checkInternetConnection() async{
+    check().then((internet){
+      if(internet == null && internet== false){
+        print(";;;;;;;;;;;;;;;;;;;;;;;;;;;$internet");
+        return showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('No internet connection '),
+                content: Text('Please connect to the internet'),
+                elevation: 6,
+                actions: <Widget>[
+                  Center(
+                    child: TextButton(onPressed: () {
+                      Navigator.pop(context);
+                    },
+                      child: Text('Ok'),
+                    ),
+                  ),
+                ],
+              );
+            });
+      }
+
+    });
+  }
+
+  //category data fatching..
   List<CategoryModel> categories = [];
   String token;
 
@@ -75,12 +108,6 @@ class _HomePageState extends State<HomePage> {
   List<CartItem> cartLength = [];
   int length;
 
-  /*getCartLength() async {
-    print("expenditure entries are");
-    final data = await Provider.of<CartLengthProvider>(context, listen: false)
-        .fetchLength();
-    print("aaaaaaaaaaaaaaaa${data}");
-  }*/
   Future<dynamic> getCartLength() async {
     cartLength.clear();
     print('lengthhhhh callll');
@@ -130,19 +157,7 @@ class _HomePageState extends State<HomePage> {
           return AlertDialog(
             title: Text('Are you sure want to LogOut ?'),
             actions: <Widget>[
-              /* TextButton(
-                // color: Colors.black,
-                // textColor: Colors.white,
-                child: Text('Update Profile'),
-                onPressed: () {
-                  */ /*Navigator.push(context, MaterialPageRoute(builder: (context){
-                    return ProfileUpdate();
-                  }));*/ /*
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
-                    return ProfileUpdate();
-                  }));
-                },
-              ),*/
+
               TextButton(
                 // color: Colors.black,
                 // textColor: Colors.white,
@@ -238,6 +253,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    checkInternetConnection();
     fetchProfile();
     fetchCategoryData();
     fatchItems();

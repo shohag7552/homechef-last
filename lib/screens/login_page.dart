@@ -42,7 +42,6 @@ class _LoginPageState extends State<LoginPage> {
           emailController.clear();
           passwordController.clear();
           onProgress = false;
-         // Navigator.of(context).pushReplacementNamed(MainPage.id);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
             return MainPage();
           }));
