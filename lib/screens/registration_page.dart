@@ -158,6 +158,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             setState(() {
               onProgress = true;
             });
+            var data;
 
             final uri = Uri.parse("https://apihomechef.masudlearn.com/api/register");
             var request = http.MultipartRequest("POST",uri);
@@ -173,19 +174,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
             var response = await request.send();
             var responseData = await response.stream.toBytes();
             var responseString = String.fromCharCodes(responseData);
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
             print("responseBody " + responseString);
+            data = jsonDecode(responseString);
+            //var data = jsonDecode(responseString);
+            showInToast(data['email'].toString());
+            //stay here
             if (response.statusCode == 201) {
               print("responseBody1 " + responseString);
+              data = jsonDecode(responseString);
               //var data = jsonDecode(responseString);
+              showInToast(data['message'].toString());
+
+              //go to the login page
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
 
             }
             else{
               setState(() {
                 onProgress = false;
               });
+              showInToast(data['email'].toString());
               var errorr = jsonDecode(responseString.trim().toString());
-              showInToast("Registered Failed, please fill all the fields");
+              //showInToast("Registered Failed, please fill all the fields");
               print("Registered failed " + responseString);
 
             }
@@ -354,8 +364,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           return "*username required";
                         }
                         if (value.length < 3) {
-                          return "*username is too short";
-                        } else if (value.length > 10) {
+                          return "*username is too short,write minimum 3 letter";
+                        } else if (value.length > 20) {
                           return "*user name is long";
                         }
                       },
@@ -369,15 +379,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     RegiTextField(
                       name: 'Your Contact Number',
                       hint: 'Enter your contact number',
+                      keytype: TextInputType.phone,
                       controller: contactController,
                       validator: ( value) {
                         if (value.isEmpty) {
                           return "*user contact required";
                         }
-                        if (value.length < 3) {
-                          return "*please write more then 3 word";
-                        } else if (value.length > 11) {
-                          return "*please write valid contact";
+                        else if ( value.length<11 && value.length<13) {
+                          return "*please write valid number";
                         }
                       },
                       onSave: (String contact) {
@@ -391,6 +400,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       name: 'Your email',
                       hint: 'Enter your email address',
                       controller: emailController,
+                      keytype: TextInputType.emailAddress,
                       validator: (value) {
                         if (value.isEmpty) {
                           return "*Email is empty";
@@ -566,7 +576,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
                             _formKey.currentState.save();
-                            getRegister(context);
+                            if(image == null){
+                              showInToast('please upload your profile image');
+                            }else{
+                              getRegister(context);
+                            }
+
                           }
 
                           print('clicked');

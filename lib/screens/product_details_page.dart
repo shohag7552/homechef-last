@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_chef/constant.dart';
+import 'package:home_chef/model/cartItems.dart';
+import 'package:home_chef/provider/CartLength_provider.dart';
 import 'package:home_chef/screens/login_page.dart';
 import 'package:home_chef/server/http_request.dart';
 import 'package:home_chef/widgets/mainPage.dart';
@@ -12,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:home_chef/model/All_items_model.dart';
 import 'package:home_chef/model/details.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailsProductsPage extends StatefulWidget {
@@ -52,6 +56,10 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
   // SharedPreferences sharedPreferences;
   // String token;
   Future AddToCard(BuildContext context, int id, int quentity) async {
+
+
+
+
     final uri = Uri.parse("https://apihomechef.masudlearn.com/api/add/cart");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
@@ -112,7 +120,12 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
     ));
   }
 
-
+  @override
+  void initState() {
+    final cartLength = Provider.of<CartLengthProvider>(context, listen: false);
+    cartLength.fetchLength(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

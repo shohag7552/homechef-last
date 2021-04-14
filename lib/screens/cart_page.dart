@@ -52,7 +52,7 @@ class _CartPageState extends State<CartPage> {
       if (data["error"] == "This item is out of stock" ){
         print('hendel');
       }else{
-        Navigator.push(context, MaterialPageRoute(builder: (context){
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
           return CheckoutPage();
         }));
       }

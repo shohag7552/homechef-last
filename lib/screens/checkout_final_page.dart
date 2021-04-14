@@ -350,7 +350,6 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                           onPressed: () {
                             Navigator.pop(context);
                             Navigator.pop(context);
-                            Navigator.pop(context);
                           },
                           child: Center(
                             child: Text(

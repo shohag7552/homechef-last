@@ -23,7 +23,7 @@ class CheckoutPage extends StatefulWidget {
 
 class _CheckoutPageState extends State<CheckoutPage> {
   var orderId;
-
+  final _formKey = GlobalKey<FormState>();
   bool isSameBillingAddress = false;
   bool isCashPay = true;
   bool isCardPay = false;
@@ -44,9 +44,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
   TextEditingController roadSheetController = TextEditingController();
   TextEditingController areaSheetController = TextEditingController();
   TextEditingController nameSheetController = TextEditingController();
+  TextEditingController citySheetController = TextEditingController();
   TextEditingController appartmentSheetController = TextEditingController();
   TextEditingController zipSheetController = TextEditingController();
   TextEditingController emailSheetController = TextEditingController();
+  TextEditingController districtSheetController = TextEditingController();
   TextEditingController contactSheetController = TextEditingController();
 
   TextEditingController contactController = TextEditingController();
@@ -79,8 +81,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     request.fields['road'] = roadSheetController.text.toString();
     request.fields['area'] = areaSheetController.text.toString();
     request.fields['area'] = areaSheetController.text.toString();
-    request.fields['city'] = sheetCity.toString();
-    request.fields['district'] = sheetDistrict.toString();
+    request.fields['city'] = citySheetController.text.toString();
+    request.fields['district'] = districtSheetController.text.toString();
 
     var response = await request.send();
     var responseData = await response.stream.toBytes();
@@ -167,7 +169,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       orderId = data["order_id"];
       print(orderId);
       if (orderId != null) {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) {
             return FinalCheckoutPage(
@@ -289,6 +291,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     zipSheetController.dispose();
     emailSheetController.dispose();
     contactSheetController.dispose();
+    citySheetController.dispose();
+    districtSheetController.dispose();
 
     contactController.dispose();
     houseController.dispose();
@@ -403,7 +407,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                   fontSize: 16),
                                             ),
                                             Text(
-                                              '$sheetDistrict',
+                                              '$sheetCity',
                                               style: TextStyle(
                                                   color: cBackgroundColor,
                                                   fontSize: 16),
@@ -457,8 +461,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 backgroundColor: Colors.transparent,
                                 builder: (BuildContext context) {
                                   return bottomSheet(context);
-                                });
-                            future.then((void value) {
+                                });/*.then((value) => fetchProfile());*/
+
+                            /*future.then((void value) {
                               if (isSameBillingAddress &&
                                   profile.billingAddress.house == null) {
                                 setState(() {
@@ -466,7 +471,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   fetchProfile();
                                 });
                               }
-                            });
+                            });*/
                           }
                         },
                         child: Container(
@@ -525,6 +530,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 name: 'Contact Number',
                                 hint: '018..',
                                 controller: contactController,
+                                keytype: TextInputType.phone,
                               ),
                               SizedBox(
                                 height: 10,
@@ -547,6 +553,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     name: 'Zip-code',
                                     hint: '125-10',
                                     controller: zipController,
+                                    keytype: TextInputType.number,
                                   )),
                                 ],
                               ),
@@ -1070,7 +1077,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   onPressed: () {
                                     postShipingAddress();
                                     if (isSameBillingAddress == false &&
-                                        nameSheetController.text.toString() == null) {
+                                        nameSheetController.text.toString() ==
+                                            null) {
                                       showInToast(
                                           'please submit the shipping address');
                                     }
@@ -1117,266 +1125,362 @@ class _CheckoutPageState extends State<CheckoutPage> {
         color: kPrimaryColor,
       ),
       child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Create Billing Address',
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            RegiTextField(
-              name: 'contact',
-              hint: 'contact number',
-              controller: contactSheetController,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: RegiTextField(
-                    name: 'name',
-                    hint: 'your name',
-                    controller: nameSheetController,
-                  ),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                    child: RegiTextField(
-                  name: 'Email',
-                  hint: 'your email',
-                  controller: emailSheetController,
-                )),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                    child: RegiTextField(
-                  name: 'Appartment',
-                  hint: 'your appartment',
-                  controller: appartmentSheetController,
-                )),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                    child: RegiTextField(
-                  name: 'Zip-code',
-                  hint: '125-10',
-                  controller: zipSheetController,
-                )),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                    child: RegiTextField(
-                  name: 'House',
-                  hint: '53/A',
-                  controller: houseSheetController,
-                )),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                    child: RegiTextField(
-                  name: 'Road',
-                  hint: '15',
-                  controller: roadSheetController,
-                )),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                    child: RegiTextField(
-                  name: 'Area',
-                  hint: 'Sector-5',
-                  controller: areaSheetController,
-                )),
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 3, bottom: 5),
-                          child: Text(
-                            'City',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 20),
-                          // margin: EdgeInsets.symmetric(
-                          //     horizontal: 20, vertical: 20),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey, width: 1),
-                              borderRadius: BorderRadius.circular(10.0)),
-                          //margin: EdgeInsets.only(top: 20),
-                          height: 60,
-                          child: Center(
-                            child: DropdownButtonFormField<String>(
-                              icon: Icon(
-                                Icons.keyboard_arrow_down,
-                                size: 25,
-                              ),
-                              decoration:
-                                  InputDecoration.collapsed(hintText: ''),
-                              value: sheetCity,
-                              hint: Text(
-                                'Select City',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black45,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              onChanged: (String newValue) {
-                                setState(() {
-                                  sheetCity = newValue;
-                                });
-                              },
-                              validator: (value) =>
-                                  value == null ? 'field required' : null,
-                              items: _getStorageHub.map((String storageValue) {
-                                return DropdownMenuItem(
-                                  value: storageValue,
-                                  child: Text(
-                                    "$storageValue ",
-                                    style: TextStyle(
-                                        color: kBlackColor, fontSize: 14),
-                                  ),
-                                  onTap: () {},
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 3, bottom: 5),
-                          child: Text(
-                            'District',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 20),
-
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey, width: 1),
-                              borderRadius: BorderRadius.circular(10.0)),
-                          //margin: EdgeInsets.only(top: 20),
-                          height: 60,
-                          child: Center(
-                            child: DropdownButtonFormField<String>(
-                              icon: Icon(
-                                Icons.keyboard_arrow_down,
-                                size: 25,
-                              ),
-                              decoration:
-                                  InputDecoration.collapsed(hintText: ''),
-                              value: sheetDistrict,
-                              hint: Text(
-                                'Select District',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black45,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              onChanged: (String newValue) {
-                                setState(() {
-                                  sheetDistrict = newValue;
-                                });
-                              },
-                              validator: (value) =>
-                                  value == null ? 'field required' : null,
-                              items: _getDistrict.map((String storageValue) {
-                                return DropdownMenuItem(
-                                  value: storageValue,
-                                  child: Text(
-                                    "$storageValue ",
-                                    style: TextStyle(
-                                        color: kBlackColor, fontSize: 14),
-                                  ),
-                                  onTap: () {},
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 0),
-              height: 50,
-              width: MediaQuery.of(context).size.width,
-              //width: double.infinity,
-              decoration: BoxDecoration(
-                color: hBlackColor,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10),
-                ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Create Billing Address',
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
               ),
-              child: TextButton(
-                onPressed: () {
-                  billingAdded();
+              SizedBox(
+                height: 10,
+              ),
+              RegiTextField(
+                name: 'contact',
+                hint: 'contact number',
+                controller: contactSheetController,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return "*user contact required";
+                  } else if (value.length < 11 && value.length < 13) {
+                    return "*please write valid number";
+                  }
                 },
-                child: Center(
-                  child: Text(
-                    'Confirm',
-                    style: fontStyle(color: hHighlightTextColor, size: 16),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: RegiTextField(
+                      name: 'name',
+                      hint: 'your name',
+                      controller: nameSheetController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "*username required";
+                        }
+                        if (value.length < 3) {
+                          return "*username is too short";
+                        } else if (value.length > 20) {
+                          return "*user name is long";
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                      child: RegiTextField(
+                    name: 'Email',
+                    hint: 'your email',
+                    controller: emailSheetController,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "*Email is empty";
+                      }
+                      if (!value.contains('@')) {
+                        return "*wrong email address";
+                      } else if (!value.contains('.')) {
+                        return "*wrong email address";
+                      }
+                    },
+                  )),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                      child: RegiTextField(
+                    name: 'Appartment',
+                    hint: 'your appartment',
+                    controller: appartmentSheetController,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "*appartment is empty";
+                      }
+                    },
+                  )),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                      child: RegiTextField(
+                    name: 'Zip-code',
+                    hint: '125-10',
+                    keytype: TextInputType.number,
+                    controller: zipSheetController,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "*zip-code is empty";
+                      }
+                    },
+                  )),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                      child: RegiTextField(
+                    name: 'House',
+                    hint: '53/A',
+                    controller: houseSheetController,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "*house is empty";
+                      }
+                    },
+                  )),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                      child: RegiTextField(
+                    name: 'Road',
+                    hint: '15',
+                    controller: roadSheetController,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "*road is empty";
+                      }
+                    },
+                  )),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                      child: RegiTextField(
+                    name: 'Area',
+                    hint: 'Sector-5',
+                    controller: areaSheetController,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "*area is empty";
+                      }
+                    },
+                  )),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: RegiTextField(
+                      name: 'City',
+                      hint: 'Your city',
+                      controller: cityController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "*city name is empty";
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                      child: RegiTextField(
+                        name: 'District',
+                        hint: 'your district',
+                        controller: districController,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "*district is empty";
+                          }
+                        },
+                      )),
+                ],
+              ),
+
+              /*Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 3, bottom: 5),
+                            child: Text(
+                              'City',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 20),
+                            // margin: EdgeInsets.symmetric(
+                            //     horizontal: 20, vertical: 20),
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.grey, width: 1),
+                                borderRadius: BorderRadius.circular(10.0)),
+                            //margin: EdgeInsets.only(top: 20),
+                            height: 60,
+                            child: Center(
+                              child: DropdownButtonFormField<String>(
+                                icon: Icon(
+                                  Icons.keyboard_arrow_down,
+                                  size: 25,
+                                ),
+                                decoration:
+                                    InputDecoration.collapsed(hintText: ''),
+                                value: sheetCity,
+                                hint: Text(
+                                  'Select City',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black45,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    sheetCity = newValue;
+                                  });
+                                },
+                                validator: (value) =>
+                                    value == null ? 'field required' : null,
+                                items:
+                                    _getStorageHub.map((String storageValue) {
+                                  return DropdownMenuItem(
+                                    value: storageValue,
+                                    child: Text(
+                                      "$storageValue ",
+                                      style: TextStyle(
+                                          color: kBlackColor, fontSize: 14),
+                                    ),
+                                    onTap: () {},
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                    child: Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 3, bottom: 5),
+                            child: Text(
+                              'District',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 20),
+
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.grey, width: 1),
+                                borderRadius: BorderRadius.circular(10.0)),
+                            //margin: EdgeInsets.only(top: 20),
+                            height: 60,
+                            child: Center(
+                              child: DropdownButtonFormField<String>(
+                                icon: Icon(
+                                  Icons.keyboard_arrow_down,
+                                  size: 25,
+                                ),
+                                decoration:
+                                    InputDecoration.collapsed(hintText: ''),
+                                value: sheetDistrict,
+                                hint: Text(
+                                  'Select District',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black45,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    sheetDistrict = newValue;
+                                  });
+                                },
+                                validator: (value) =>
+                                    value == null ? 'field required' : null,
+                                items: _getDistrict.map((String storageValue) {
+                                  return DropdownMenuItem(
+                                    value: storageValue,
+                                    child: Text(
+                                      "$storageValue ",
+                                      style: TextStyle(
+                                          color: kBlackColor, fontSize: 14),
+                                    ),
+                                    onTap: () {},
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),*/
+              SizedBox(
+                height: 30,
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 0),
+                height: 50,
+                width: MediaQuery.of(context).size.width,
+                //width: double.infinity,
+                decoration: BoxDecoration(
+                  color: hBlackColor,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      _formKey.currentState.save();
+                      billingAdded().then((value) => fetchProfile());
+
+                    }
+
+                  },
+                  child: Center(
+                    child: Text(
+                      'Confirm',
+                      style: fontStyle(color: hHighlightTextColor, size: 16),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

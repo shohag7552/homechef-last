@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:home_chef/constant.dart';
 import 'package:home_chef/model/profile_model.dart';
 import 'package:home_chef/provider/Profile_provider.dart';
@@ -41,6 +42,9 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
 
   Future profileUpdate() async {
     // if (isShipping == true) {
+    setState(() {
+      onProgress = true;
+    });
     final uri =
         Uri.parse("https://apihomechef.masudlearn.com/api/update/profile");
     var request = http.MultipartRequest("POST", uri);
@@ -53,7 +57,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
     request.fields['road'] = roadController.text.toString();
     request.fields['area'] = areaController.text.toString();
     request.fields['city'] = cityController.text.toString();
-    request.fields['district'] = districtController.text.toString();
+    request.fields['district'] = district.toString();
     print(request.fields);
     var photo = await http.MultipartFile.fromPath('image', image.path);
     print('processing');
@@ -71,6 +75,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
       var data = jsonDecode(responseString);
       print('oooooooooooooooooooo');
       print(data);
+      showInToast(data['message']);
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
         return MainPage();
       }));
@@ -87,6 +92,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
       var errorr = jsonDecode(responseString.trim().toString());
       // showInSnackBar("Registered Failed, ${errorr}");
       print("profile update failed " + errorr);
+      showInToast(errorr);
     }
   }
 
@@ -99,6 +105,18 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
         print('no image found');
       }
     });
+  }
+
+  showInToast(String value){
+    Fluttertoast.showToast(
+        msg: "$value",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: hHighlightTextColor,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
   }
 
 
@@ -409,7 +427,12 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
                           _formKey.currentState.save();
-                          profileUpdate();
+                          if(image == null){
+                            showInToast('please upload your profile image');
+                          }else{
+
+                            profileUpdate();
+                          }
                         }
 
 

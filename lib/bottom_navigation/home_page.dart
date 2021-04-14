@@ -172,7 +172,7 @@ class _HomePageState extends State<HomePage> {
                   SharedPreferences preferences =
                   await SharedPreferences.getInstance();
                   await preferences.remove('token');
-                  Navigator.of(context).pushReplacement(
+                  Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) {
                         return LoginPage();
                       }));
@@ -215,7 +215,7 @@ class _HomePageState extends State<HomePage> {
 
   //search item
   List<Search> list = [];
-
+/*
   Future fatchItems() async {
     final uri = Uri.parse(
         "https://apihomechef.masudlearn.com/api/product/search?name=");
@@ -249,21 +249,27 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
-  }
+  }*/
+
 
   @override
   void initState() {
     checkInternetConnection();
     fetchProfile();
     fetchCategoryData();
-    fatchItems();
-    if(mounted){
+    //fatchItems();
+    //getCartLength();
+   /* if(mounted){
       timer = Timer.periodic(Duration(seconds: 2), (timer) {
         getCartLength();
       });
-    }
+    }*/
+
+    /*final cartLength = Provider.of<CartLengthProvider>(context, listen: false);
+    cartLength.fetchLength(context);*/
     super.initState();
   }
+
 
   @override
   void dispose() {
@@ -276,6 +282,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     //categories = Provider.of<MyitemsProvider>(context).category;
     //length = Provider.of<CartLengthProvider>(context).items;
+    //length = Provider.of<CartLengthProvider>(context).items.length;
+    //final cartLength = Provider.of<CartLengthProvider>(context);
     double width = MediaQuery
         .of(context)
         .size
@@ -335,7 +343,8 @@ class _HomePageState extends State<HomePage> {
                         }));
                       }
                       else {
-                        if (length > 0) {
+                        //cartLength.length
+                        if ( cartLength.length> 0) {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
                                 return CartPage();
@@ -360,7 +369,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: Center(
                         child: Text(
-                          cartLength.isEmpty ? "0" : length.toString(),
+                          cartLength.isEmpty ? "0" : cartLength.length.toString(),
                           style: TextStyle(fontSize: 8, color: Colors.black),
                         ),
                       ),
@@ -422,8 +431,12 @@ class _HomePageState extends State<HomePage> {
                             ),
                             TextButton(
                               onPressed: (){
-                                showSearch(context: context, delegate: SearchHere(itemsList: list));
-
+                                /*showSearch(context: context, delegate: SearchHere(itemsList: list)).then((value){
+                                  setState(() {
+                                    getCartLength();
+                                  });
+                                });
+*/
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
@@ -464,15 +477,20 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   height: height * 0.6,
-                  child: PageView(physics: BouncingScrollPhysics(),
-
+                  child: PageView(
+                    physics: BouncingScrollPhysics(),
                     controller: pageController,
                     onPageChanged: _onPageChange,
                     children: <Widget>[
                       for (int i = 0; i < categories.length; i++)
                         InkWell(
                           onTap: () {
-                            getCartLength().then((value) => getCartLength());
+                            getCartLength().then((value){
+                              setState(() {
+                                getCartLength();
+                                print('call');
+                              });
+                            });
                           },
                           child: ShowItemsByCategory(
                             id: categories[i].id,
@@ -495,6 +513,8 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           selectIndex = index;
           pageController.jumpToPage(selectIndex);
+          getCartLength();
+          print('length call');
         });
       },
       child: Padding(

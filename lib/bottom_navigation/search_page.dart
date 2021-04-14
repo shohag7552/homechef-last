@@ -16,29 +16,45 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
 
+  TextEditingController searchController = TextEditingController();
+
   bool onProgress = false;
-  List<Search> list = [];
+  List<Search> searchList = [];
+  Search search ;
 
-
-
-  Future fatchItems() async {
-    setState(() {
+  Future searchItems() async {
+    /*setState(() {
       onProgress = true;
-    });
+    });*/
     final uri = Uri.parse(
-        "https://apihomechef.masudlearn.com/api/product/search?name=");
+        "https://apihomechef.masudlearn.com/api/search/product");
 
-    var request = http.Request("POST", uri);
+    var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.defaultHeader);
+    print('going');
+    //request.bodyFields
+    request.fields['name'] = searchController.text.toString();
+    print('gone');
     var response = await request.send();
+    print(response.statusCode);
     var responseData = await response.stream.toBytes();
 
     var responseString = String.fromCharCodes(responseData);
 
     print("responseBody1 " + responseString);
     var data = jsonDecode(responseString);
-    //search = Search.fromJson(data);
+   // search = Search.fromJson(data);
     print("print all search is : $data");
+    /*print("print all search is : $search");
+    setState(() {
+      onProgress =false;
+    });*/
+    /*if(response.statusCode == 200){
+      for (var entry in data){
+        search = Search.fromJson(entry);
+        searchList.add(search);
+      }
+    }*/
     for (var entry in data) {
       Search search = Search(
         id: entry['id'],
@@ -47,14 +63,14 @@ class _SearchPageState extends State<SearchPage> {
       );
       try {
         print("all data ${entry['name']}");
-        list.firstWhere((element) => element.id == entry['id']);
+        searchList.firstWhere((element) => element.id == entry['id']);
         setState(() {
           onProgress = false;
         });
       } catch (e) {
         if (mounted) {
           setState(() {
-            list.add(search);
+            searchList.add(search);
             onProgress = false;
           });
         }
@@ -64,7 +80,8 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   void initState() {
-    fatchItems();
+
+    //searchItems();
     super.initState();
   }
 
@@ -75,58 +92,68 @@ class _SearchPageState extends State<SearchPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        title: Text('Search'),
+        title: TextFormField(
+          controller: searchController,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Search..'
+          ),
+          onSaved: (value){
+
+            searchItems();
+          },
+          autofocus: true,
+
+        ),
+        leading: IconButton(icon: Icon(Icons.clear),onPressed: (){
+          searchController.text = '';
+          searchList = [];
+        },),
         actions: [
           IconButton(
             onPressed: () {
-              showSearch(context: context, delegate: SearchHere(itemsList: list));
+              //showSearch(context: context, delegate: SearchHere(itemsList: list));
+              searchItems();
             },
             icon: Icon(Icons.search),)
         ],
       ),
-      body:  ModalProgressHUD(
-        inAsyncCall: onProgress,
-        opacity: 0.2,
-        progressIndicator: Spin(),
-        child: Container(
-          child: ListView.builder(
-              itemCount: list.length,
+      body:  Container(
+        child:searchList.isEmpty ? Center(child: Text('search'),) : searchController.text.isEmpty? Center(child: Text('search'),) : ListView.builder(
+            itemCount: searchList.length,
 
-              itemBuilder: (context,index){
-                if(list.length >0){
-                  return  Card(
-                    elevation: 0.2,
-                    margin: EdgeInsets.symmetric(horizontal: 10,vertical: 1),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: ListTile(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context){
-                            return SearchDetailsPage(id: list[index].id,);
-                          }));
-                        },
-                        title: Text('${list[index].name}', style: TextStyle(
-                            fontSize: 14,
-                            fontWeight:
-                            FontWeight.w500)),
-                        //subtitle: Text("${list[index].id}"),
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              "https://homechef.masudlearn.com/images/${list[index].image}"),
-                          radius: 30,
-                        ),
+            itemBuilder: (context,index){
+
+                return  Card(
+                  elevation: 0.2,
+                  margin: EdgeInsets.symmetric(horizontal: 10,vertical: 1),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: ListTile(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context){
+                          return SearchDetailsPage(id:searchList[index].id,);
+                        }));
+                      },
+                      title: Text('${searchList[index].name}', style: TextStyle(
+                          fontSize: 14,
+                          fontWeight:
+                          FontWeight.w500)),
+                      //subtitle: Text("${list[index].id}"),
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            "https://homechef.masudlearn.com/images/${searchList[index].image}"),
+                        radius: 30,
                       ),
                     ),
-                  );
-                }else{
-                  return Center(child: Spin(),);
-                }
-              }),
-        ),
+                  ),
+                );
+
+            }) ,
       ),
     );
   }
-}
+/*}
 class SearchHere extends SearchDelegate<Search>{
   final List<Search> itemsList;
   SearchHere({this.itemsList});
@@ -146,7 +173,7 @@ class SearchHere extends SearchDelegate<Search>{
 
   @override
   Widget buildResults(BuildContext context) {
-    final myList = query.isEmpty? itemsList :
+
     itemsList.where((element) => element.name.toLowerCase().startsWith(query)).toList();
     return  myList.isEmpty ? Center(child: Text('No result found',style: TextStyle(fontSize: 18),)) : ListView.builder(
         itemCount: myList.length,
@@ -204,4 +231,5 @@ class SearchHere extends SearchDelegate<Search>{
         });
   }
 
+*/
 }

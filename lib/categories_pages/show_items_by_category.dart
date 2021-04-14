@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:home_chef/model/All_items_model.dart';
 import 'package:home_chef/provider/Burger_category_provider.dart';
+import 'package:home_chef/provider/CartLength_provider.dart';
 import 'package:home_chef/screens/product_details_page.dart';
 import 'package:home_chef/server/http_request.dart';
 import 'package:home_chef/widgets/product_card.dart';
@@ -60,6 +61,8 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
   @override
   void initState() {
     fetchSubCategories(widget.id);
+    final cartLength = Provider.of<CartLengthProvider>(context, listen: false);
+    cartLength.fetchLength(context);
     super.initState();
   }
 
@@ -80,32 +83,7 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
                   crossAxisCount: 2,
                 ),
                 itemBuilder: (BuildContext context, int index) {
-                  /*print('................');
-            print(allItems.foods[index].price[index].originalPrice);
-            print(allItems.foods[index].price[index].discountedPrice);
-            print(allItems.foods[index].name);
-            print('................');*/
-
-                  // return Text(it.foods[index].price[index].discountedPrice);
                   return InkWell(
-                    /*child: Center(
-                child: ListTile(
-                  title: Text(
-                      "${allItems.foods[index].name?? ""}"
-                  ),
-                  */ /*trailing: Text(""
-                      "${allItems.foods[index].price[index].originalPrice?? ""}"
-                  ),*/ /*
-                )
-              ),*/
-                    // onTap: () {
-                    //   Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //           builder: (context) => DetailsProductsPage(
-                    //                 products: item[index],
-                    //               )));
-                    // },
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
@@ -122,8 +100,6 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
                     },
 
                     child: ProductCard(
-                      // price: it.foods[index].price[index].originalPrice ?? "",
-                      // disprice: it.foods[index].price[index].discountedPrice ?? "",
                       image:
                           "https://homechef.masudlearn.com/images/${allItems.foods[index].image}",
                       name: allItems.foods[index].name ?? "",

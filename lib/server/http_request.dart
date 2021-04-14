@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:home_chef/model/cartItems.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,7 +46,9 @@ class CustomHttpRequest {
       print(e);
       return {"error": "Something Wrong Exception"};
     }
-  }  static Future<dynamic> getShippingAddress(int id) async {
+  }
+
+  static Future<dynamic> getShippingAddress(int id) async {
     try {
       var response = await http.get(
         "$uri/api/order/shipping/address/$id",headers: await getHeaderWithToken()
@@ -59,6 +62,7 @@ class CustomHttpRequest {
   }
 
  static Future<dynamic> getCartItems()async{
+   List<CartItem> items = [];
    try {
      var response = await http.get(
        "$uri/api/view/cart",headers: await getHeaderWithToken(),
@@ -70,6 +74,34 @@ class CustomHttpRequest {
      return {"error": "Something Wrong Exception"};
    }
  }
+  //provider...
+  static Future<dynamic> getCartLength(context) async{
+    CartItem cartItem;
+    List<CartItem> cartList = [];
+    try{
+      String url = "$uri/api/view/cart";
+      Uri myUri = Uri.parse(url);
+      http.Response response = await http.get(
+          myUri,headers: await getHeaderWithToken()
+      );
+      if(response.statusCode == 200){
+
+        final item = json.decode(response.body);
+        for(var i in item){
+          cartItem = CartItem.fromJson(i);
+          cartList.add(cartItem);
+          print(cartList.length);
+        }
+
+      }
+      else{
+        print('Data not found');
+      }
+    } catch(e){
+      print(e);
+    }
+    return cartList;
+  }
 
   static Future<dynamic> getSubCategory(int id) async {
     try {

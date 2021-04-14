@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:home_chef/model/All_items_model.dart';
+import 'package:home_chef/provider/CartLength_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProductCard extends StatefulWidget {
   final String price, image, name;
@@ -15,6 +17,13 @@ class ProductCard extends StatefulWidget {
 
 class _ProductCardState extends State<ProductCard> {
   Items it;
+
+  @override
+  void initState() {
+    final cartLength = Provider.of<CartLengthProvider>(context, listen: false);
+    cartLength.fetchLength(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
