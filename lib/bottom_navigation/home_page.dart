@@ -265,15 +265,15 @@ class _HomePageState extends State<HomePage> {
       });
     }*/
 
-    /*final cartLength = Provider.of<CartLengthProvider>(context, listen: false);
-    cartLength.fetchLength(context);*/
+    final cartLength = Provider.of<CartLengthProvider>(context, listen: false);
+    cartLength.fetchLength(context);
     super.initState();
   }
 
 
   @override
   void dispose() {
-    timer.cancel();
+   // timer.cancel();
     pageController.dispose();
     super.dispose();
   }
@@ -283,7 +283,7 @@ class _HomePageState extends State<HomePage> {
     //categories = Provider.of<MyitemsProvider>(context).category;
     //length = Provider.of<CartLengthProvider>(context).items;
     //length = Provider.of<CartLengthProvider>(context).items.length;
-    //final cartLength = Provider.of<CartLengthProvider>(context);
+    final cartLength = Provider.of<CartLengthProvider>(context);
     double width = MediaQuery
         .of(context)
         .size
@@ -344,7 +344,7 @@ class _HomePageState extends State<HomePage> {
                       }
                       else {
                         //cartLength.length
-                        if ( cartLength.length> 0) {
+                        if ( cartLength.cartList.length> 0) {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
                                 return CartPage();
@@ -369,7 +369,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: Center(
                         child: Text(
-                          cartLength.isEmpty ? "0" : cartLength.length.toString(),
+                          cartLength.cartList.isEmpty ? "0" : cartLength.cartList.length.toString(),
                           style: TextStyle(fontSize: 8, color: Colors.black),
                         ),
                       ),
@@ -485,12 +485,7 @@ class _HomePageState extends State<HomePage> {
                       for (int i = 0; i < categories.length; i++)
                         InkWell(
                           onTap: () {
-                            getCartLength().then((value){
-                              setState(() {
-                                getCartLength();
-                                print('call');
-                              });
-                            });
+                            cartLength.fetchLength(context);
                           },
                           child: ShowItemsByCategory(
                             id: categories[i].id,

@@ -69,6 +69,7 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
   @override
   Widget build(BuildContext context) {
     //item = Provider.of<BurgerCategoryProvider>(context).foodItems;
+    final cartLength = Provider.of<CartLengthProvider>(context);
 
     return ModalProgressHUD(
       inAsyncCall: onProgress,
@@ -85,6 +86,7 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
                     onTap: () {
+                      cartLength.fetchLength(context);
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
                         return DetailsProductsPage(

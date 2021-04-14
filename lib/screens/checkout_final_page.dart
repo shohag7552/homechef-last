@@ -6,8 +6,10 @@ import 'package:home_chef/model/All_items_model.dart';
 import 'package:home_chef/model/Shipping_model.dart';
 import 'package:home_chef/model/Sumarry_model.dart';
 import 'package:home_chef/model/profile_model.dart';
+import 'package:home_chef/provider/CartLength_provider.dart';
 import 'package:home_chef/server/http_request.dart';
 import 'package:home_chef/widgets/spin_kit.dart';
+import 'package:provider/provider.dart';
 
 class FinalCheckoutPage extends StatefulWidget {
   final int order_id;
@@ -109,6 +111,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cartLength = Provider.of<CartLengthProvider>(context);
     name =  profile != null ? profile.name : '';
     contact = profile != null ? profile.contact : '';
     address = profile != null ? profile.billingAddress.house : '';
@@ -348,6 +351,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                         ),
                         child: TextButton(
                           onPressed: () {
+                            cartLength.fetchLength(context);
                             Navigator.pop(context);
                             Navigator.pop(context);
                           },

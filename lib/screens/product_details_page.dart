@@ -129,6 +129,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cartLength = Provider.of<CartLengthProvider>(context);
     double discountPrice = double.parse(widget.discountPrice);
     double orginalPrice = double.parse(widget.originalPrice);
 
@@ -181,6 +182,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                           icon: SvgPicture.asset("assets/arrow-left.svg"),
                           onPressed: () {
                             Navigator.of(context).pop();
+                            cartLength.fetchLength(context);
                           },
                         ),
                         Text(
@@ -405,6 +407,8 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                               }else{
 
                                 AddToCard(context,item_id,count);
+                                cartLength.fetchLength(context);
+
                                 setState(() {
                                   onProgress = true;
                                 });

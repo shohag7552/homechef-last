@@ -80,7 +80,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     request.fields['house'] = houseSheetController.text.toString();
     request.fields['road'] = roadSheetController.text.toString();
     request.fields['area'] = areaSheetController.text.toString();
-    request.fields['area'] = areaSheetController.text.toString();
     request.fields['city'] = citySheetController.text.toString();
     request.fields['district'] = districtSheetController.text.toString();
 
@@ -232,6 +231,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String proArea;
   String proAppertment;
   String proZip;
+  String proCity;
+  String proDis;
+
 
   Future<dynamic> fetchProfile() async {
     setState(() {
@@ -253,6 +255,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
         proArea = profile.billingAddress.area.toString();
         proAppertment = profile.billingAddress.appartment.toString();
         proZip = profile.billingAddress.zipCode.toString();
+        proCity = profile.billingAddress.city.toString();
+        proDis = profile.billingAddress.district.toString();
       });
     }
     if (profile.billingAddress.house != null) {
@@ -264,7 +268,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       areaSheetController.text = proArea;
       appartmentSheetController.text = proAppertment;
       zipSheetController.text = proZip;
-      sheetDistrict = profile.billingAddress.district.toString();
+      citySheetController.text = proCity;
+      districtSheetController.text = proDis;
     }
     if (profile.billingAddress.house == null) {
       nameSheetController.text = proName;
@@ -309,33 +314,33 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        resizeToAvoidBottomInset: true,
-        backgroundColor: kwhiteColor,
-        appBar: AppBar(
-          backgroundColor: kPrimaryColor,
-          elevation: 0,
-          title: Text(
-            'Checkout',
-            style: TextStyle(
-                fontSize: 17, fontWeight: FontWeight.w500, color: hBlackColor),
-          ),
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: hBlackColor,
+      child: ModalProgressHUD(
+        inAsyncCall: onProgress,
+        opacity: 0.1,
+        progressIndicator: Spin(),
+        child: Scaffold(
+          key: _scaffoldKey,
+          resizeToAvoidBottomInset: true,
+          backgroundColor: kwhiteColor,
+          appBar: AppBar(
+            backgroundColor: kPrimaryColor,
+            elevation: 0,
+            title: Text(
+              'Checkout',
+              style: TextStyle(
+                  fontSize: 17, fontWeight: FontWeight.w500, color: hBlackColor),
             ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: hBlackColor,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ),
-        ),
-        body: ModalProgressHUD(
-          inAsyncCall: onProgress,
-          opacity: 0.1,
-          progressIndicator: Spin(),
-          child: Stack(
+          body: Stack(
             children: [
               Container(
                 height: MediaQuery.of(context).size.height,
@@ -407,7 +412,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                   fontSize: 16),
                                             ),
                                             Text(
-                                              '$sheetCity',
+                                              '$proCity',
                                               style: TextStyle(
                                                   color: cBackgroundColor,
                                                   fontSize: 16),
@@ -427,7 +432,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         backgroundColor: Colors.transparent,
                                         builder: (BuildContext context) {
                                           return bottomSheet(context);
-                                        });
+                                        }).then((value) => fetchProfile());
                                   },
                                   icon: Text(
                                     'Edit',
@@ -461,7 +466,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 backgroundColor: Colors.transparent,
                                 builder: (BuildContext context) {
                                   return bottomSheet(context);
-                                });/*.then((value) => fetchProfile());*/
+                                }).then((value) => fetchProfile());
 
                             /*future.then((void value) {
                               if (isSameBillingAddress &&
@@ -1280,7 +1285,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     child: RegiTextField(
                       name: 'City',
                       hint: 'Your city',
-                      controller: cityController,
+                      controller: citySheetController,
                       validator: (value) {
                         if (value.isEmpty) {
                           return "*city name is empty";
@@ -1295,7 +1300,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       child: RegiTextField(
                         name: 'District',
                         hint: 'your district',
-                        controller: districController,
+                        controller: districtSheetController,
                         validator: (value) {
                           if (value.isEmpty) {
                             return "*district is empty";
