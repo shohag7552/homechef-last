@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:home_chef/constant.dart';
 import 'package:home_chef/model/Search_details_model.dart';
 import 'package:home_chef/screens/cart_page.dart';
@@ -59,9 +60,9 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
     var response = await request.send();
     var responseData = await response.stream.toBytes();
     var responseString = String.fromCharCodes(responseData);
+    print(response.statusCode);
     print("responseBody " + responseString);
     //showInSnackBar("${responseString}");
-
     if (response.statusCode == 201) {
       print("responseBody1 " + responseString);
       var data = jsonDecode(responseString);
@@ -69,19 +70,57 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
       var b = data["error"];
       //showInSnackBar(responseString);
       if(a != null){
-        if(mounted){
-          setState(() {
-            count = 1;
-            onProgress = false;
-          });
-        }
         showInSnackBar(value: a,color: Colors.green);
+        setState(() {
+          count = 1;
+          onProgress = false;
+        });
+
+
       }
       else{
         showInSnackBar(value: b,color: Colors.red);
         //_showSnackMessage(message: responseString);
+        setState(() {
+          onProgress = false;
+        });
       }
     }
+
+    if (response.statusCode == 200) {
+      print("responseBody1 " + responseString);
+      var data = jsonDecode(responseString);
+      var a = data["message"];
+      var b = data["error"];
+      //showInSnackBar(responseString);
+      if(a != null){
+          showInSnackBar(value: a,color: Colors.green);
+          setState(() {
+            count = 1;
+            onProgress = false;
+          });
+
+
+      }
+      else{
+        showInSnackBar(value: b,color: Colors.red);
+        //_showSnackMessage(message: responseString);
+        setState(() {
+          onProgress = false;
+        });
+      }
+    }
+  }
+  showInToast(String value){
+    Fluttertoast.showToast(
+        msg: "$value",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: hHighlightTextColor,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
   }
 
   List<SearchDetails> item = [];

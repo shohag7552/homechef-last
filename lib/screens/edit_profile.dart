@@ -140,6 +140,8 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
   String proArea;
   String proAppertment;
   String proZip;
+  String proCity;
+  String proDistrict;
 
   Future<dynamic> fetchProfile() async {
     final data = await CustomHttpRequest.getProfile();
@@ -154,6 +156,8 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
         proEmail = profile.email.toString();
         proContact =profile.contact.toString();
         proArea =profile.billingAddress.area.toString();
+        proCity =profile.billingAddress.city.toString();
+        proDistrict =profile.billingAddress.district.toString();
       });
     }
     nameController.text = proName;
@@ -162,8 +166,8 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
     emailController.text =proEmail;
     contactController.text =proContact;
     areaController.text = proArea;
-    cityController.text = profile.billingAddress.city;
-    districtController = profile.billingAddress.district;
+    cityController.text = proCity;
+    districtController.text = proDistrict;
 
   }
   @override

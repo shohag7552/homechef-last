@@ -35,6 +35,19 @@ class CustomHttpRequest {
       return {"error": "Something Wrong Exception"};
     }
   }
+  static Future<dynamic> SearchItems() async {
+    try {
+      var response = await http.get(
+        "$uri/api/products",
+      );
+      final data = jsonDecode(response.body);
+      return data;
+    } catch (e) {
+      print(e);
+      return {"error": "Something Wrong Exception"};
+    }
+  }
+
   static Future<dynamic> getProfile() async {
     try {
       var response = await http.get(

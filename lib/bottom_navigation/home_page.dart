@@ -29,6 +29,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool onProgress = false;
 
   //internet connection
   Future<bool> check() async {
@@ -215,41 +216,35 @@ class _HomePageState extends State<HomePage> {
 
   //search item
   List<Search> list = [];
-/*
+
   Future fatchItems() async {
-    final uri = Uri.parse(
-        "https://apihomechef.masudlearn.com/api/product/search?name=");
-
-    var request = http.Request("POST", uri);
-    request.headers.addAll(await CustomHttpRequest.defaultHeader);
-    var response = await request.send();
-    var responseData = await response.stream.toBytes();
-
-    var responseString = String.fromCharCodes(responseData);
-
-    print("responseBody1 " + responseString);
-    var data = jsonDecode(responseString);
-    //search = Search.fromJson(data);
-    print("print all search is : $data");
-    for (var entry in data) {
-      Search search = Search(
-        id: entry['id'],
-        name: entry['name'],
-        image: entry['image'],
+    setState(() {
+      onProgress = true;
+    });
+    final data = await CustomHttpRequest.SearchItems();
+    print("value are $data");
+    for (var entries in data) {
+      Search model = Search(
+        id: entries["id"],
+        name: entries['name'],
+        image: entries['image'],
       );
       try {
-        print("all data ${entry['name']}");
-        list.firstWhere((element) => element.id == entry['id']);
+        print(" view my entries are  ${entries['name']}");
+        list.firstWhere((element) => element.id == entries['id']);
+        setState(() {
+          onProgress = false;
+        });
       } catch (e) {
         if (mounted) {
           setState(() {
-            list.add(search);
+            list.add(model);
+            onProgress = false;
           });
         }
       }
     }
-
-  }*/
+  }
 
 
   @override
@@ -257,7 +252,7 @@ class _HomePageState extends State<HomePage> {
     checkInternetConnection();
     fetchProfile();
     fetchCategoryData();
-    //fatchItems();
+    fatchItems();
     //getCartLength();
    /* if(mounted){
       timer = Timer.periodic(Duration(seconds: 2), (timer) {
@@ -431,12 +426,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                             TextButton(
                               onPressed: (){
-                                /*showSearch(context: context, delegate: SearchHere(itemsList: list)).then((value){
-                                  setState(() {
-                                    getCartLength();
-                                  });
+                                showSearch(context: context, delegate: SearchHere(itemsList: list)).then((value){
+                                  cartLength.fetchLength(context);
                                 });
-*/
+
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
