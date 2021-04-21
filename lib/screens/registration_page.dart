@@ -171,7 +171,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
             var photo = await http.MultipartFile.fromPath('image', image.path);
             print('processing');
             request.files.add(photo);
+            print('processing 1');
             var response = await request.send();
+            print('processing 2');
             var responseData = await response.stream.toBytes();
             var responseString = String.fromCharCodes(responseData);
             print("responseBody " + responseString);
@@ -179,6 +181,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             //var data = jsonDecode(responseString);
             showInToast(data['email'].toString());
             //stay here
+            print(response.statusCode);
             if (response.statusCode == 201) {
               print("responseBody1 " + responseString);
               data = jsonDecode(responseString);
@@ -434,8 +437,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         if (value.isEmpty) {
                           return "*Password is empty";
                         }
-                        if (value.length < 3) {
-                          return "*Password is too short";
+                        if (value.length < 6) {
+                          return "*Password contains more then 6 carecters";
                         }
                         if (value.length > 10) {
                           return "*Password not contains more then 10 carecters";

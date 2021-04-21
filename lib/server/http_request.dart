@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:home_chef/model/cartItems.dart';
+import 'package:home_chef/model/categories.dart';
+import 'package:home_chef/model/category_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,6 +38,38 @@ class CustomHttpRequest {
       return {"error": "Something Wrong Exception"};
     }
   }
+
+  //provider...
+  static Future<dynamic> getCategories(context) async{
+    Categories categories;
+    List<Categories> categoryList = [];
+    try{
+
+
+      String url = "$uri/api/category";
+      Uri myUri = Uri.parse(url);
+      http.Response response = await http.get(
+          myUri,headers: await getHeaderWithToken()
+      );
+      if(response.statusCode == 200){
+
+        final item = json.decode(response.body);
+        for(var i in item){
+          categories = Categories.fromJson(i);
+          categoryList.add(categories);
+        }
+
+
+      }
+      else{
+        print('Data not found');
+      }
+    } catch(e){
+      print(e);
+    }
+    return categoryList;
+  }
+
   static Future<dynamic> SearchItems() async {
     try {
       var response = await http.get(

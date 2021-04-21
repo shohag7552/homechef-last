@@ -80,6 +80,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     request.fields['house'] = houseSheetController.text.toString();
     request.fields['road'] = roadSheetController.text.toString();
     request.fields['area'] = areaSheetController.text.toString();
+    print(" area is =====${areaSheetController.text}");
     request.fields['city'] = citySheetController.text.toString();
     request.fields['district'] = districtSheetController.text.toString();
 
@@ -93,7 +94,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
     var data = jsonDecode(responseString);
     showInToast(data['message']);
     print("responseBody " + responseString);
+    print(response.statusCode);
 
+    if(response.statusCode == 200){
+      var data = jsonDecode(responseString);
+      print('oofghjkoooooo');
+      print(data);
+      print(data['error']);
+       showInToast(data['error']);
+      setState(() {
+        onProgress = false;
+      });
+    }
     if (response.statusCode == 201) {
       print("responseBody1 " + responseString);
       var data = jsonDecode(responseString);
@@ -357,88 +369,93 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               Radius.circular(8),
                             ),
                           ),
+                          height: 80,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 20),
                             child: Row(
                               children: [
-                                Container(
-                                  height: 36,
-                                  width: 36,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(8),
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    height: 36,
+                                    width: 36,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.15),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8),
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.location_on,
+                                      color: hHighlightTextColor,
                                     ),
                                   ),
-                                  child: Icon(
-                                    Icons.location_on,
-                                    color: hHighlightTextColor,
-                                  ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'House',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color:
-                                                Colors.white.withOpacity(0.5)),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Visibility(
-                                        visible: profile != null &&
-                                            profile.billingAddress.house !=
-                                                null,
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              '$proHouseNumber , ',
-                                              style: TextStyle(
-                                                  color: cBackgroundColor,
-                                                  fontSize: 16),
-                                            ),
-                                            Text(
-                                              '$proRoadNumber St, ',
-                                              style: TextStyle(
-                                                  color: cBackgroundColor,
-                                                  fontSize: 16),
-                                            ),
-                                            Text(
-                                              '$proCity',
-                                              style: TextStyle(
-                                                  color: cBackgroundColor,
-                                                  fontSize: 16),
-                                            )
-                                          ],
+                                Expanded(
+                                  flex: 7,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(
+                                            'House',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color:
+                                                    Colors.white.withOpacity(0.5)),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(
+                                          height: 3,
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Visibility(
+                                            visible: profile != null &&
+                                                profile.billingAddress.house !=
+                                                    null,
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Text(
+                                                '$proHouseNumber , $proRoadNumber St, $proCity',
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    color: cBackgroundColor,
+
+                                                    fontSize: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                Spacer(),
-                                IconButton(
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        backgroundColor: Colors.transparent,
-                                        builder: (BuildContext context) {
-                                          return bottomSheet(context);
-                                        }).then((value) => fetchProfile());
-                                  },
-                                  icon: Text(
-                                    'Edit',
-                                    style: TextStyle(
-                                        color: hHighlightTextColor,
-                                        fontSize: 12),
+                                //Spacer(),
+                                Expanded(
+                                  flex: 2,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (BuildContext context) {
+                                            return bottomSheet(context);
+                                          }).then((value) => fetchProfile());
+                                    },
+                                    icon: Text(
+                                      'Edit',
+                                      style: TextStyle(
+                                          color: hHighlightTextColor,
+                                          fontSize: 12),
+                                    ),
                                   ),
                                 )
                               ],

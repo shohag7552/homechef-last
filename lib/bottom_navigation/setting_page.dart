@@ -112,7 +112,7 @@ class _SettingPageState extends State<SettingPage> {
   loadProfileData() async {
     print("expenditure entries are");
     final data = await Provider.of<ProfileProvider>(context, listen: false)
-        .fetchProfile();
+        .fetchProfile(context);
     print("aaaaaaaaaaaaaaaa${data}");
   }
 

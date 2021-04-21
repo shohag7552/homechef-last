@@ -205,7 +205,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
         body: ModalProgressHUD(
           inAsyncCall: onProgress,
           opacity: 0.2,
-          progressIndicator: Spin(),
+          progressIndicator: Container(child: Center(child: Spin())),
           child: Stack(children: [
             Column(
               children: [

@@ -59,30 +59,46 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
     request.fields['city'] = cityController.text.toString();
     request.fields['district'] = district.toString();
     print(request.fields);
-    var photo = await http.MultipartFile.fromPath('image', image.path);
-    print('processing');
-    request.files.add(photo);
+    if(image != null) {
+      var photo = await http.MultipartFile.fromPath('image', image.path);
+      print('processing');
+      request.files.add(photo);
+    }
 
     var response = await request.send();
     var responseData = await response.stream.toBytes();
     var responseString = String.fromCharCodes(responseData);
     print("responseBody " + responseString);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+    print(response.statusCode);
+   /* Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
       return MainPage();
-    }));
-    if (response.statusCode == 201) {
+    }));*/
+    if (response.statusCode == 200) {
       print("responseBody1 " + responseString);
       var data = jsonDecode(responseString);
       print('oooooooooooooooooooo');
       print(data);
-      showInToast(data['message']);
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-        return MainPage();
-      }));
+      if(data['error'] != null) {
+        showInToast(data['error']);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) {
+          return MainPage();
+        }));
 
-      setState(() {
-        onProgress = false;
-      });
+        setState(() {
+          onProgress = false;
+        });
+      }else{
+        showInToast(data['message']);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) {
+          return MainPage();
+        }));
+
+        setState(() {
+          onProgress = false;
+        });
+      }
       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
     } else {
       setState(() {
@@ -226,6 +242,66 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(50)),
                         border:
+                        Border.all(color: Colors.black, width: 2.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(50),
+                              ),
+                            ),
+                            child: image == null
+                                ? InkWell(
+                              onTap: () {
+                                // selectImage(context);
+                                getImageformGallery();
+                              },
+                              child: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  //  "https://homechef.masudlearn.com/avatar/${profileData.profile != null ? profileData.profile.image : ''}"
+                                        "https://homechef.masudlearn.com/avatar/${profile != null ? profile.image: ''}",
+
+                                ),
+                              ),
+                            )
+                                : CircleAvatar(
+                              backgroundImage: FileImage(image),
+                            )
+                          // : Image.file(
+                          //     image,
+                          //     fit: BoxFit.cover,
+                          //   ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: -15,
+                      top: -15,
+                      child: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            image = null;
+                          });
+                        },
+                        icon: image != null
+                            ? Icon(Icons.clear)
+                            : Icon(
+                          Icons.clear,
+                          color: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                  ]),
+                  /*Stack(children: [
+                    Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(50)),
+                        border:
                             Border.all(color: hHighlightTextColor, width: 2.0),
                       ),
                       child: Padding(
@@ -276,7 +352,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                               ),
                       ),
                     ),
-                  ]),
+                  ]),*/
                   SizedBox(
                     height: 10,
                   ),
@@ -431,12 +507,13 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
                           _formKey.currentState.save();
-                          if(image == null){
-                            showInToast('please upload your profile image');
-                          }else{
-
-                            profileUpdate();
-                          }
+                          profileUpdate();
+                          // if(image == null){
+                          //   showInToast('please upload your profile image');
+                          // }else{
+                          //
+                          //   profileUpdate();
+                          // }
                         }
 
 

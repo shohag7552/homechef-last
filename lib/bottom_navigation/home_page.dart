@@ -9,6 +9,7 @@ import 'package:home_chef/categories_pages/show_items_by_category.dart';
 import 'package:home_chef/constant.dart';
 import 'package:home_chef/model/SearchProduct_model.dart';
 import 'package:home_chef/model/cartItems.dart';
+import 'package:home_chef/model/categories.dart';
 import 'package:home_chef/model/category_model.dart';
 import 'package:home_chef/model/profile_model.dart';
 import 'package:home_chef/provider/CartLength_provider.dart';
@@ -262,6 +263,9 @@ class _HomePageState extends State<HomePage> {
 
     final cartLength = Provider.of<CartLengthProvider>(context, listen: false);
     cartLength.fetchLength(context);
+
+    final Pcategories = Provider.of<CategoriesProvider>(context, listen: false);
+    Pcategories.getCategories(context, onProgress);
     super.initState();
   }
 
@@ -275,7 +279,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    //categories = Provider.of<MyitemsProvider>(context).category;
+    final Pcategories = Provider.of<CategoriesProvider>(context);
     //length = Provider.of<CartLengthProvider>(context).items;
     //length = Provider.of<CartLengthProvider>(context).items.length;
     final cartLength = Provider.of<CartLengthProvider>(context);
@@ -459,9 +463,45 @@ class _HomePageState extends State<HomePage> {
                         height: 30,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: categories.length,
+                          itemCount: Pcategories.categoriesList.length,
                           itemBuilder: (context, index) {
-                            return tebItems(index);
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectIndex = index;
+                                  pageController.jumpToPage(selectIndex);
+                                  //getCartLength();
+                                  cartLength.fetchLength(context);
+                                  print('length call');
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 15),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                  Text(
+                                  Pcategories.categoriesList[index].name,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: selectIndex == index ? hBlackColor : Colors.black45,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Container(
+                                  height: 3,
+                                  width: 25,
+                                  color: selectIndex == index
+                                      ? hHighlightTextColor
+                                      : Colors.transparent,
+                                )
+                                ],
+                              ),
+                            ),
+                            );
                           },
                         ),
                       ),
@@ -494,7 +534,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
+/*
   Widget tebItems(int index) {
     return GestureDetector(
       onTap: () {
@@ -511,7 +551,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              categories[index].name,
+              ,
               style: TextStyle(
                 fontSize: 16,
                 color: selectIndex == index ? hBlackColor : Colors.black45,
@@ -532,5 +572,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
+  }*/
 }

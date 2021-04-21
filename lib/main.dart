@@ -25,6 +25,7 @@ void main() {
 List<SingleChildWidget> providers = [
   ChangeNotifierProvider<CartLengthProvider>(create: (_) => CartLengthProvider()),
   ChangeNotifierProvider<ProfileProvider>(create: (_) => ProfileProvider()),
+  ChangeNotifierProvider<CategoriesProvider>(create: (_) => CategoriesProvider()),
 ];
 
 class MyApp extends StatelessWidget {

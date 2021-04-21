@@ -10,7 +10,7 @@ class ProfileProvider with ChangeNotifier{
   Profile profile;
 
 
-  Future<dynamic> fetchProfile() async {
+  Future<dynamic> fetchProfile(BuildContext context) async {
     final data = await CustomHttpRequest.getProfile();
 
     print("Profile data are $data");

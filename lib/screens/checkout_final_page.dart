@@ -64,7 +64,9 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
     print(profile);
     print(
         '.......#############################..........................................................');
-  }List<Shipping> shippingData = [];
+  }
+
+  List<Shipping> shippingData = [];
   Shipping shipping;
 
   Future<dynamic> fetchShipping(int id) async {
@@ -81,9 +83,10 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
     print(
         '.......#############################..........................................................');
   }
-  String name ,contact,address,road ,district;
 
- /* Future showInformation()async{
+  String name, contact, address, road, district, city;
+
+  /* Future showInformation()async{
     if(shipping.data.shippingAddress == null){
       name =  profile != null ? profile.name : '';
       contact = profile != null ? profile.contact : '';
@@ -112,11 +115,12 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
   @override
   Widget build(BuildContext context) {
     final cartLength = Provider.of<CartLengthProvider>(context);
-    name =  profile != null ? profile.name : '';
+    name = profile != null ? profile.name : '';
     contact = profile != null ? profile.contact : '';
     address = profile != null ? profile.billingAddress.house : '';
     road = profile != null ? profile.billingAddress.road : '';
     district = profile != null ? profile.billingAddress.district : '';
+    city = profile != null ? profile.billingAddress.city : '';
     return Scaffold(
       body: widget.order_id == null
           ? Container(
@@ -125,7 +129,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
               ),
             )
           : SafeArea(
-            child: Center(
+              child: Center(
                 child: Stack(
                   children: [
                     Column(
@@ -269,7 +273,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                                 color: Colors.black38),
                                           ),
                                           Text(
-                                            "${shipping != null? name : name}",
+                                            "${shipping != null ? name : name}",
                                             style: TextStyle(fontSize: 12),
                                           ),
                                         ],
@@ -278,6 +282,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                         height: 5,
                                       ),
                                       Row(
+
                                         children: [
                                           Text(
                                             'Contact :',
@@ -286,7 +291,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                                 color: Colors.black38),
                                           ),
                                           Text(
-                                            "${shipping != null?shipping.data.shippingAddress.contact : contact}",
+                                            "${shipping != null ? shipping.data.shippingAddress.contact : contact}",
                                             style: TextStyle(fontSize: 12),
                                           ),
                                         ],
@@ -295,6 +300,8 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                         height: 5,
                                       ),
                                       Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Address :',
@@ -302,12 +309,23 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                                 fontSize: 12,
                                                 color: Colors.black38),
                                           ),
-                                          Text(
-                                            "${shipping != null?shipping.data.shippingAddress.house : address}",
-
-                                            style: TextStyle(fontSize: 12),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${shipping != null ? shipping.data.shippingAddress.house : address} house,${shipping != null ? shipping.data.shippingAddress.road : road} road,",
+                                                style:
+                                                TextStyle(
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              Text(
+                                                "${shipping != null ? shipping.data.shippingAddress.city : city}",
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
+                                          /*Text(
                                             " house, ",
                                             style: TextStyle(fontSize: 12),
                                           ),
@@ -322,7 +340,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                           Text(
                                             "${shipping != null?shipping.data.shippingAddress.district: district}",
                                             style: TextStyle(fontSize: 12),
-                                          ),
+                                          ),*/
                                         ],
                                       ),
                                     ],
@@ -368,7 +386,7 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                   ],
                 ),
               ),
-          ),
+            ),
     );
   }
 }

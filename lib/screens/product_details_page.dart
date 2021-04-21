@@ -71,6 +71,15 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
     print("responseBody " + responseString);
     //showInSnackBar("${responseString}");
 
+    print(response.statusCode);
+    if (response.statusCode == 200){
+      var data = jsonDecode(responseString);
+      setState(() {
+        onProgress = false;
+      });
+      print(data['error']);
+      showInSnackBar(value: data['error'],color: Colors.red);
+    }
     if (response.statusCode == 201) {
       print("responseBody1 " + responseString);
       var data = jsonDecode(responseString);
@@ -406,6 +415,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                                 }));
                               }else{
 
+                                cartLength.fetchLength(context);
                                 AddToCard(context,item_id,count);
                                 cartLength.fetchLength(context);
 
