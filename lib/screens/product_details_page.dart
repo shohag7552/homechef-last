@@ -155,14 +155,15 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
         fit: BoxFit.cover,
       ),
     ];
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: kwhiteColor,
-        body: ModalProgressHUD(
-          inAsyncCall: onProgress,
-          opacity: 0.2,
-          progressIndicator: Spin(),
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: kwhiteColor,
+      body: ModalProgressHUD(
+        inAsyncCall: onProgress,
+        opacity: 0.2,
+        progressIndicator: Spin(),
+        child: SafeArea(
+
           child: Stack(children: [
             Column(
               children: [
@@ -176,11 +177,14 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                       child: Container(
                         height: 350,
                         width: MediaQuery.of(context).size.width,
-                        child: PageView(
-                          controller: pageController,
-                          onPageChanged: _onPageChange,
-                          children: images,
+                        child: Hero(
+                          tag: "image",
+                          child: PageView(
+                            controller: pageController,
+                            onPageChanged: _onPageChange,
+                            children: images,
 
+                          ),
                         ),
                       ),
                     ),

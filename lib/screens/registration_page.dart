@@ -179,10 +179,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
             print("responseBody " + responseString);
             data = jsonDecode(responseString);
             //var data = jsonDecode(responseString);
-            showInToast(data['email'].toString());
+
             //stay here
             print(response.statusCode);
-            if (response.statusCode == 201) {
+            if (response.statusCode == 400){
+              showInToast(data['email'][0]);
+            }
+              if (response.statusCode == 201) {
               print("responseBody1 " + responseString);
               data = jsonDecode(responseString);
               //var data = jsonDecode(responseString);
@@ -196,7 +199,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               setState(() {
                 onProgress = false;
               });
-              showInToast(data['email'].toString());
+              showInToast('Something wrong');
               var errorr = jsonDecode(responseString.trim().toString());
               //showInToast("Registered Failed, please fill all the fields");
               print("Registered failed " + responseString);

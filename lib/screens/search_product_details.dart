@@ -198,14 +198,15 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
         fit: BoxFit.cover,
       ),
     ];
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: kwhiteColor,
-        body: ModalProgressHUD(
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: kwhiteColor,
+      body: fullItems != null ? SafeArea(
+
+        child: ModalProgressHUD(
           inAsyncCall: onProgress,
-          opacity: 0.2,
-          progressIndicator: Container(child: Center(child: Spin())),
+          opacity: 0.1,
+          progressIndicator: Spin(),
           child: Stack(children: [
             Column(
               children: [
@@ -488,7 +489,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
             ),
           ]),
         ),
-      ),
+      ) : Container(child:  Center(child: Spin()),),
     );
   }
 

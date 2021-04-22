@@ -43,21 +43,21 @@ class _SettingPageState extends State<SettingPage> {
     SharedPreferences preferences =
     await SharedPreferences.getInstance();
     await preferences.remove('token');
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginPage()));
 
-    showInToast(responseString);
-    if (response.statusCode == 201) {
+    print(response.statusCode);
+    if (response.statusCode == 200) {
       print("responseBody1 " + responseString);
       print('successfully changed password...');
-      //var data = jsonDecode(responseString);
+      var data = jsonDecode(responseString);
       //showInSnackBar("$responseString");
-
-
+      showInToast(data['message']);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginPage()));
     }
     else{
      /* setState(() {
         onProgress = false;
       });*/
+      showInToast('Something wrong');
       var errorr = jsonDecode(responseString.trim().toString());
       print('Did not changed password...');
      // showInSnackBar("Registered Failed, ${errorr}");
