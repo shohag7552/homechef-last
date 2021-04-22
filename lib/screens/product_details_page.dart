@@ -57,9 +57,6 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
   // String token;
   Future AddToCard(BuildContext context, int id, int quentity) async {
 
-
-
-
     final uri = Uri.parse("https://apihomechef.masudlearn.com/api/add/cart");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
@@ -143,7 +140,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
     double orginalPrice = double.parse(widget.originalPrice);
 
     int item_id = widget.id;
-
+    print("product id : $item_id");
 
     List<Widget> images = [
       Image.network(

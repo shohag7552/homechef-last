@@ -11,6 +11,7 @@ import 'package:home_chef/widgets/registerTextField.dart';
 import 'package:home_chef/widgets/spin_kit.dart';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:provider/provider.dart';
 
 class CheckoutPage extends StatefulWidget {
   double totalPrice;
@@ -325,6 +326,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       child: ModalProgressHUD(
         inAsyncCall: onProgress,
