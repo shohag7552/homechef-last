@@ -1,14 +1,3 @@
-// To parse this JSON data, do
-//
-//     final cartItems = cartItemsFromJson(jsonString);
-//
-// import 'dart:convert';
-//
-// List<CartItems> cartItemsFromJson(String str) => List<CartItems>.from(json.decode(str).map((x) => CartItems.fromJson(x)));
-//
-// String cartItemsToJson(List<CartItems> data) => json.encode(
-//     List<dynamic>.from(data.map((x) => x.toJson())));
-
 class CartItem {
   CartItem({
     this.id,
@@ -19,9 +8,9 @@ class CartItem {
   });
 
   int id;
-  String quantity;
-  String price;
-  String totalPrice;
+  int quantity;
+  int price;
+  int totalPrice;
   FoodItem foodItem;
 
   factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
@@ -75,8 +64,8 @@ class Price {
     this.discountedPrice,
   });
 
-  String originalPrice;
-  String discountedPrice;
+  int originalPrice;
+  int discountedPrice;
 
   factory Price.fromJson(Map<String, dynamic> json) => Price(
     originalPrice: json["original_price"],

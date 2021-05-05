@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:home_chef/constant.dart';
 import 'package:home_chef/screens/registration_page.dart';
 import 'package:home_chef/server/http_request.dart';
-import 'package:home_chef/widgets/login_fild.dart';
 import 'package:home_chef/widgets/logintextField.dart';
 import 'package:home_chef/widgets/mainPage.dart';
-import 'package:home_chef/widgets/registerTextField.dart';
 import 'package:home_chef/widgets/spin_kit.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -152,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                           Row(
                             children: [
                               Text(
-                                'Hay!',
+                                'Hey!',
                                 style: fontStyle(
                                     size: 22,
                                     color: hHighlightTextColor,

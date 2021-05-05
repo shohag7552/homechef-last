@@ -57,7 +57,7 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
   // String token;
   Future AddToCard(BuildContext context, int id, int quentity) async {
 
-    final uri = Uri.parse("https://apihomechef.masudlearn.com/api/add/cart");
+    final uri = Uri.parse("https://apihomechef.antapp.space/api/add/cart");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
     request.fields['food_item_id'] = id.toString();
@@ -76,6 +76,15 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
       });
       print(data['error']);
       showInSnackBar(value: data['error'],color: Colors.red);
+
+    }
+    if(response.statusCode == 401){
+      var data = jsonDecode(responseString);
+      setState(() {
+        onProgress = false;
+      });
+      showInSnackBar(value: data['errors'],color: Colors.red);
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginPage()));
     }
     if (response.statusCode == 201) {
       print("responseBody1 " + responseString);
@@ -144,11 +153,11 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
 
     List<Widget> images = [
       Image.network(
-        'https://homechef.masudlearn.com/images/${widget.image}',
+        'https://homechef.antapp.space/images/${widget.image}',
         fit: BoxFit.cover,
       ),
       Image.network(
-        'https://homechef.masudlearn.com/images/${widget.image}',
+        'https://homechef.antapp.space/images/${widget.image}',
         fit: BoxFit.cover,
       ),
     ];
@@ -174,14 +183,11 @@ class _DetailsProductsPageState extends State<DetailsProductsPage> {
                       child: Container(
                         height: 350,
                         width: MediaQuery.of(context).size.width,
-                        child: Hero(
-                          tag: "image",
-                          child: PageView(
-                            controller: pageController,
-                            onPageChanged: _onPageChange,
-                            children: images,
+                        child: PageView(
+                          controller: pageController,
+                          onPageChanged: _onPageChange,
+                          children: images,
 
-                          ),
                         ),
                       ),
                     ),

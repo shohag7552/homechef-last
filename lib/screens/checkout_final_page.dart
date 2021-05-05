@@ -196,56 +196,61 @@ class _FinalCheckoutPageState extends State<FinalCheckoutPage> {
                                           allItems.orderFoodItems.length ==
                                               null)
                                       ? Spin()
-                                      : ListView.builder(
-                                          itemCount: allItems != null
-                                              ? allItems.orderFoodItems.length
-                                              : 0,
-                                          itemBuilder: (context, index) {
-                                            int quantity = int.parse(allItems
-                                                .orderFoodItems[index]
-                                                .pivot
-                                                .quantity);
-                                            print(quantity.toString());
-                                            double price = double.parse(allItems
-                                                .orderFoodItems[index]
-                                                .price[0]
-                                                .discountedPrice);
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                              child: ListTile(
-                                                leading: CircleAvatar(
-                                                  //child: Image.asset('assets/pizza.jpg'),
-                                                  backgroundImage: NetworkImage(
-                                                      "https://homechef.masudlearn.com/images/${allItems.orderFoodItems[index].image}"),
-                                                  radius: 30,
+                                      : RawScrollbar(
+                                    thumbColor: hHighlightTextColor,
+                                    isAlwaysShown: true,
+                                    thickness: 3.0,
+                                        child: ListView.builder(
+                                            itemCount: allItems != null
+                                                ? allItems.orderFoodItems.length
+                                                : 0,
+                                            itemBuilder: (context, index) {
+                                              int quantity = allItems
+                                                  .orderFoodItems[index]
+                                                  .pivot
+                                                  .quantity;
+                                              print(quantity.toString());
+                                              double price = double.parse(allItems
+                                                  .orderFoodItems[index]
+                                                  .price[0]
+                                                  .discountedPrice.toString());
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 10),
+                                                child: ListTile(
+                                                  leading: CircleAvatar(
+                                                    //child: Image.asset('assets/pizza.jpg'),
+                                                    backgroundImage: NetworkImage(
+                                                        "https://homechef.antapp.space/images/${allItems.orderFoodItems[index].image}"),
+                                                    radius: 30,
+                                                  ),
+                                                  title: Text(
+                                                    allItems != null
+                                                        ? allItems
+                                                            .orderFoodItems[index]
+                                                            .name
+                                                        : '',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                  ),
+                                                  subtitle: Text(
+                                                      'x ${allItems != null ? allItems.orderFoodItems[index].pivot.quantity : ''}'),
+                                                  trailing: Text(
+                                                    '${price * quantity}',
+                                                    style: TextStyle(
+                                                        color: cTextColor,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                  ),
                                                 ),
-                                                title: Text(
-                                                  allItems != null
-                                                      ? allItems
-                                                          .orderFoodItems[index]
-                                                          .name
-                                                      : '',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                                subtitle: Text(
-                                                    'x ${allItems != null ? allItems.orderFoodItems[index].pivot.quantity : ''}'),
-                                                trailing: Text(
-                                                  '${price * quantity}',
-                                                  style: TextStyle(
-                                                      color: cTextColor,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
+                                              );
+                                            },
+                                          ),
+                                      ),
                                 ),
                                 SizedBox(
                                   height: 30,

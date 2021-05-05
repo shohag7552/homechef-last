@@ -52,7 +52,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
   // String token;
   Future AddToCard(BuildContext context, int id, int quentity) async {
 
-    final uri = Uri.parse("https://apihomechef.masudlearn.com/api/add/cart");
+    final uri = Uri.parse("https://apihomechef.antapp.space/api/add/cart");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
     request.fields['food_item_id'] = id.toString();
@@ -183,18 +183,18 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
   @override
   Widget build(BuildContext context) {
 
-    double discountPrice = fullItems != null ? double.parse(fullItems.price[0].discountedPrice) : null;
-    double orginalPrice = fullItems != null ? double.parse(fullItems.price[0].originalPrice) : null;
+    double discountPrice = fullItems != null ? double.parse(fullItems.price[0].discountedPrice.toString()) : null;
+    double orginalPrice = fullItems != null ? double.parse(fullItems.price[0].originalPrice.toString()) : null;
 
     int item_id = widget.id;
 
     List<Widget> images = [
       Image.network(
-        'https://homechef.masudlearn.com/images/${fullItems != null ? fullItems.image: ""}',
+        'https://homechef.antapp.space/images/${fullItems != null ? fullItems.image: ""}',
         fit: BoxFit.cover,
       ),
       Image.network(
-        'https://homechef.masudlearn.com/images/${fullItems != null ? fullItems.image:""}',
+        'https://homechef.antapp.space/images/${fullItems != null ? fullItems.image:""}',
         fit: BoxFit.cover,
       ),
     ];

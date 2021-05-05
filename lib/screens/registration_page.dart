@@ -160,7 +160,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             });
             var data;
 
-            final uri = Uri.parse("https://apihomechef.masudlearn.com/api/register");
+            final uri = Uri.parse("https://apihomechef.antapp.space/api/sign-up");
             var request = http.MultipartRequest("POST",uri);
             request.headers.addAll(await CustomHttpRequest.defaultHeader);
             request.fields['name'] = nameController.text.toString();

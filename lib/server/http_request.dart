@@ -1,14 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:home_chef/model/cartItems.dart';
 import 'package:home_chef/model/categories.dart';
-import 'package:home_chef/model/category_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomHttpRequest {
-  static const String uri = "https://apihomechef.masudlearn.com"; //common api
+  static const String uri = "https://apihomechef.antapp.space"; //common api
 
 
   static const Map<String, String> defaultHeader = {
@@ -51,9 +49,14 @@ class CustomHttpRequest {
       http.Response response = await http.get(
           myUri,headers: await getHeaderWithToken()
       );
+      print("Categories status :  ${response.statusCode}");
+
+      final item = json.decode(response.body);
+      print("Categories :  $item");
       if(response.statusCode == 200){
 
         final item = json.decode(response.body);
+        print(item);
         for(var i in item){
           categories = Categories.fromJson(i);
           categoryList.add(categories);
@@ -132,9 +135,11 @@ class CustomHttpRequest {
       http.Response response = await http.get(
           myUri,headers: await getHeaderWithToken()
       );
+      print(" cart status${response.statusCode}");
       if(response.statusCode == 200){
 
         final item = json.decode(response.body);
+        print(item);
         for(var i in item){
           cartItem = CartItem.fromJson(i);
           cartList.add(cartItem);
@@ -223,7 +228,7 @@ class CustomHttpRequest {
 
   static Future<String> login(String email, String password) async {
     try {
-      String url = "$uri/api/login";
+      String url = "$uri/api/sign-in";
       var map = Map<String, dynamic>();
       map['email'] = email;
       map['password'] = password;

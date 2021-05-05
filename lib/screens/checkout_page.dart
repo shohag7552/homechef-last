@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:home_chef/constant.dart';
 import 'package:home_chef/model/profile_model.dart';
+import 'package:home_chef/provider/CartLength_provider.dart';
 import 'package:home_chef/screens/checkout_final_page.dart';
 import 'package:home_chef/server/http_request.dart';
 import 'package:home_chef/widgets/check_textField.dart';
@@ -69,9 +70,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Future billingAdded() async {
     // if (isShipping == true) {
     final uri =
-        Uri.parse("https://apihomechef.masudlearn.com/api/update/profile");
+        Uri.parse("https://apihomechef.antapp.space/api/update/profile");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
+
+   /* name, email, image(optional), contact(optional), area(optional), appartment(optional),
+    house(optional), road(optional), city(optional), district(optional), zip_code(optional)*/
 
     request.fields['name'] = nameSheetController.text.toString();
     request.fields['contact'] = contactSheetController.text.toString();
@@ -84,8 +88,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     print(" area is =====${areaSheetController.text}");
     request.fields['city'] = citySheetController.text.toString();
     request.fields['district'] = districtSheetController.text.toString();
-
+    print('send process');
     var response = await request.send();
+    print('send done');
     var responseData = await response.stream.toBytes();
     var responseString = String.fromCharCodes(responseData);
     setState(() {
@@ -130,7 +135,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future postShipingAddress() async {
-    final uri = Uri.parse("https://apihomechef.masudlearn.com/api/place/order");
+    final uri = Uri.parse("https://apihomechef.antapp.space/api/place/order");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
 
@@ -160,9 +165,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
       request.fields['shipping_zip_code'] = zipController.text.toString();
       request.fields['shipping_house'] = houseController.text.toString();
       request.fields['shipping_road'] = roadController.text.toString();
-      request.fields['shipping_city'] = cityType.toString();
+      //request.fields['shipping_city'] = cityType.toString();
+      request.fields['shipping_city'] = cityController.text.toString();
       // print('shipping city added to city :${cityType.toString()} ');
-      request.fields['shipping_district'] = districtType.toString();
+      request.fields['shipping_district'] = districController.text.toString();
     }
 
     var response = await request.send();
@@ -189,8 +195,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
             );
           }),
         );
+        final cartLength = Provider.of<CartLengthProvider>(context);
+        cartLength.fetchLength(context);
       } else {
-        showInToast('please fill the shipping address');
+        showInToast('please fill all the shipping address');
       }
 
       setState(() {
@@ -620,7 +628,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: Container(
+                                    child: RegiTextField(
+                                      name: 'City',
+                                      hint: 'your city',
+                                      controller: cityController,
+                                    ),
+                                    /*Container(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -695,13 +708,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ],
                                       ),
-                                    ),
+                                    ),*/
                                   ),
                                   SizedBox(
                                     width: 5,
                                   ),
                                   Expanded(
-                                    child: Container(
+                                    child: RegiTextField(
+                                      name: 'District',
+                                      hint: 'your district',
+                                      controller: districController,
+                                    ),
+                                    /*Container(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -777,7 +795,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ],
                                       ),
-                                    ),
+                                    ),*/
                                   ),
                                 ],
                               ),

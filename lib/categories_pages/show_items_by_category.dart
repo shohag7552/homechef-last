@@ -1,8 +1,7 @@
-// import 'dart:html';
+
 
 import 'package:flutter/material.dart';
 import 'package:home_chef/model/All_items_model.dart';
-import 'package:home_chef/provider/Burger_category_provider.dart';
 import 'package:home_chef/provider/CartLength_provider.dart';
 import 'package:home_chef/screens/product_details_page.dart';
 import 'package:home_chef/server/http_request.dart';
@@ -35,7 +34,7 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
     allItems = Items.fromJson(data);
     print(
         '....#####################..................................................................');
-    print(allItems);
+    print("all data :----------  -$allItems");
     print(
         '.......#############################..........................................................');
 
@@ -78,7 +77,7 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
       child: Container(
         child: item.isNotEmpty
             ? GridView.builder(
-                physics: NeverScrollableScrollPhysics(),
+                physics: BouncingScrollPhysics(),
                 itemCount: allItems.foods.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -94,22 +93,19 @@ class _ShowItemsByCategoryState extends State<ShowItemsByCategory> {
                           name: allItems.foods[index].name,
                           image: allItems.foods[index].image,
                           originalPrice:
-                              allItems.foods[index].price[0].originalPrice,
+                              allItems.foods[index].price[0].originalPrice.toString(),
                           discountPrice:
-                              allItems.foods[index].price[0].discountedPrice,
+                              allItems.foods[index].price[0].discountedPrice.toString(),
                         );
                       }));
                     },
 
-                    child: Hero(
-                      tag: "image",
-                      child: ProductCard(
-                        image:
-                            "https://homechef.masudlearn.com/images/${allItems.foods[index].image}",
-                        name: allItems.foods[index].name ?? "",
-                        price: allItems.foods[index].price[0].originalPrice,
-                        disprice: allItems.foods[index].price[0].discountedPrice,
-                      ),
+                    child: ProductCard(
+                      image:
+                          "https://homechef.antapp.space/images/${allItems.foods[index].image}",
+                      name: allItems.foods[index].name ?? "",
+                      price: allItems.foods[index].price[0].originalPrice.toString(),
+                      disprice: allItems.foods[index].price[0].discountedPrice.toString(),
                     ),
                   );
                 },

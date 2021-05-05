@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +8,15 @@ import 'package:home_chef/categories_pages/show_items_by_category.dart';
 import 'package:home_chef/constant.dart';
 import 'package:home_chef/model/SearchProduct_model.dart';
 import 'package:home_chef/model/cartItems.dart';
-import 'package:home_chef/model/categories.dart';
 import 'package:home_chef/model/category_model.dart';
 import 'package:home_chef/model/profile_model.dart';
 import 'package:home_chef/provider/CartLength_provider.dart';
 import 'package:home_chef/provider/homepage_provider.dart';
 import 'package:home_chef/screens/cart_page.dart';
-import 'package:home_chef/screens/edit_profile.dart';
 import 'package:home_chef/screens/login_page.dart';
 import 'package:home_chef/server/http_request.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   static const String id = 'HomePage';
@@ -248,6 +244,7 @@ class _HomePageState extends State<HomePage> {
   }
 
 
+
   @override
   void initState() {
     checkInternetConnection();
@@ -255,11 +252,7 @@ class _HomePageState extends State<HomePage> {
     fetchCategoryData();
     fatchItems();
     //getCartLength();
-   /* if(mounted){
-      timer = Timer.periodic(Duration(seconds: 2), (timer) {
-        getCartLength();
-      });
-    }*/
+
 
     final cartLength = Provider.of<CartLengthProvider>(context, listen: false);
     cartLength.fetchLength(context);
@@ -280,8 +273,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final Pcategories = Provider.of<CategoriesProvider>(context);
-    //length = Provider.of<CartLengthProvider>(context).items;
-    //length = Provider.of<CartLengthProvider>(context).items.length;
     final cartLength = Provider.of<CartLengthProvider>(context);
     double width = MediaQuery
         .of(context)
@@ -509,9 +500,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Container(
-                  height: height * 0.6,
+                  height: height * 0.75,
+                 // margin: EdgeInsets.only(bottom: 50),
                   child: PageView(
-                    physics: BouncingScrollPhysics(),
+                   // physics: BouncingScrollPhysics(),
                     controller: pageController,
                     onPageChanged: _onPageChange,
                     children: <Widget>[
@@ -526,7 +518,8 @@ class _HomePageState extends State<HomePage> {
                         )
                     ],
                   ),
-                )
+                ),
+               // SizedBox(height: 50,)
               ],
             ),
           ), //

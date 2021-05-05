@@ -1,4 +1,3 @@
-
 class Sumary {
   Sumary({
     this.id,
@@ -11,8 +10,8 @@ class Sumary {
   });
 
   int id;
-  String quantity;
-  String price;
+  int quantity;
+  int price;
   dynamic discount;
   dynamic vat;
   DateTime orderDateAndTime;
@@ -81,10 +80,10 @@ class Pivot {
     this.updatedAt,
   });
 
-  String orderId;
-  String foodItemId;
-  String foodItemPriceId;
-  String quantity;
+  int orderId;
+  int foodItemId;
+  int foodItemPriceId;
+  int quantity;
   DateTime createdAt;
   DateTime updatedAt;
 
@@ -113,8 +112,8 @@ class Price {
     this.discountedPrice,
   });
 
-  String originalPrice;
-  String discountedPrice;
+  int originalPrice;
+  int discountedPrice;
 
   factory Price.fromJson(Map<String, dynamic> json) => Price(
     originalPrice: json["original_price"],

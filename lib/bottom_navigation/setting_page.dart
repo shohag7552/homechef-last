@@ -178,7 +178,7 @@ class _SettingPageState extends State<SettingPage> {
                       ),
                       child: CircleAvatar(
                         backgroundImage: NetworkImage(
-                          "https://homechef.masudlearn.com/avatar/${profile != null ? profile.image.toString() : ''}",
+                          "https://homechef.antapp.space/images/${profile != null ? profile.image.toString() : ''}",
                         ),
                       ),
                     ),

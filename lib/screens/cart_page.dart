@@ -42,7 +42,7 @@ class _CartPageState extends State<CartPage> {
       onProgress = true;
     });
 
-    final uri = Uri.parse("https://apihomechef.masudlearn.com/api/cart/$id/update");
+    final uri = Uri.parse("https://apihomechef.antapp.space/api/cart/$id/update");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
     request.fields['food_item_id'] = food_id.toString();
@@ -67,12 +67,12 @@ class _CartPageState extends State<CartPage> {
 
   Future updateCart(CartItem item) async {
     final uri = Uri.parse(
-        "https://apihomechef.masudlearn.com/api/cart/${item.id.toString()}/update");
+        "https://apihomechef.antapp.space/api/cart/${item.id.toString()}/update");
     var request = http.MultipartRequest("POST", uri);
     request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
     request.fields['food_item_id'] = item.foodItem.id.toString();
     print('|food item id: | ${item.foodItem.id}');
-    request.fields['quantity'] = item.quantity;
+    request.fields['quantity'] = item.quantity.toString();
     print("quantity ${item.quantity}");
     var response = await request.send();
     var responseData = await response.stream.toBytes();
@@ -124,7 +124,7 @@ class _CartPageState extends State<CartPage> {
   calcTotalPrice() {
     double total = 0.0;
     items.forEach((item) {
-      total += double.parse(item.totalPrice);
+      total += item.totalPrice;
     });
     setState(() {
       totalPrice = total;
@@ -132,14 +132,14 @@ class _CartPageState extends State<CartPage> {
   }
 
   changeQuantity(int index, String type) {
-    int quantity = int.parse(items[index].quantity);
+    int quantity = items[index].quantity;
 
     if (type == 'DEC' && quantity == 1) return 0;
     quantity = type == 'INC' ? quantity + 1 : quantity - 1;
     setState(() {
-      items[index].quantity = quantity.toString();
+      items[index].quantity = quantity;
       items[index].totalPrice =
-          (double.parse(items[index].price) * quantity).toString();
+          (items[index].price) * quantity;
     });
     print('1st =$quantity');
     calcTotalPrice();
@@ -332,7 +332,7 @@ class _CartPageState extends State<CartPage> {
                         totalPrice: items[index].totalPrice,
                         quentity: items[index].quantity,
                       );*/
-                            var quentity = int.parse(items[index].quantity);
+                            var quentity = items[index].quantity;
 
                             return Padding(
                               padding: const EdgeInsets.all(5.0),
@@ -355,7 +355,7 @@ class _CartPageState extends State<CartPage> {
                                               Radius.circular(50)),
                                           image: DecorationImage(
                                               image: NetworkImage(
-                                                  "https://homechef.masudlearn.com/images/${items[index].foodItem.image}"),
+                                                  "https://homechef.antapp.space/images/${items[index].foodItem.image}"),
                                               fit: BoxFit.cover),
                                         ),
                                       ),
@@ -368,14 +368,22 @@ class _CartPageState extends State<CartPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              items[index]
-                                                  .foodItem
-                                                  .name
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 14),
+
+                                            Container(
+                                              height: 30,
+                                              width: MediaQuery.of(context).size.width*0.5,
+                                              child: Expanded(
+
+                                                child: Text(
+                                                  items[index]
+                                                      .foodItem
+                                                      .name
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.w500,
+                                                      fontSize: 14),
+                                                ),
+                                              ),
                                             ),
                                             SizedBox(
                                               height: 5,
@@ -409,7 +417,7 @@ class _CartPageState extends State<CartPage> {
                                                           print(items[index].quantity);
                                                           int food_id = items[index].foodItem.id;
                                                           int id = items[index].id;
-                                                          int quentity = int.parse(items[index].quantity);
+                                                          int quentity = items[index].quantity;
                                                           addToCard(context, id: id,food_id: food_id,quentity: quentity);
 
                                                         },
@@ -439,7 +447,7 @@ class _CartPageState extends State<CartPage> {
                                                           print(items[index].quantity);
                                                           int food_id = items[index].foodItem.id;
                                                           int id = items[index].id;
-                                                          int quentity = int.parse(items[index].quantity);
+                                                          int quentity = items[index].quantity;
                                                           addToCard(context, id: id,food_id: food_id,quentity: quentity);
 
 

@@ -100,7 +100,7 @@ class _SearchPageState extends State<SearchPage> {
                         // subtitle: Text("${list[index].price[0].originalPrice}"),
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(
-                              "https://homechef.masudlearn.com/images/${list[index].image}"),
+                              "https://homechef.antapp.space/images/${list[index].image}"),
                           radius: 30,
                         ),
                       ),
@@ -153,7 +153,7 @@ class SearchHere extends SearchDelegate<Search>{
                 title: Text(myList[index].name.toString()),
                 leading: CircleAvatar(
                   backgroundImage: NetworkImage(
-                      "https://homechef.masudlearn.com/images/${myList[index].image}"),
+                      "https://homechef.antapp.space/images/${myList[index].image}"),
                   radius: 30,
                 ),
               ),
@@ -186,7 +186,7 @@ class SearchHere extends SearchDelegate<Search>{
                   title: Text(myList[index].name.toString()),
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(
-                        "https://homechef.masudlearn.com/images/${myList[index].image}"),
+                        "https://homechef.antapp.space/images/${myList[index].image}"),
                     radius: 30,
                   ),
                 ),
